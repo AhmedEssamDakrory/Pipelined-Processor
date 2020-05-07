@@ -5,10 +5,10 @@ USE ieee.std_logic_unsigned.ALL;
 ENTITY Reg IS
  generic (N : Integer := 32);
  PORT(
-    d   : IN STD_LOGIC_VECTOR(N-1 DOWNTO 0);
     Load  : IN STD_LOGIC;
     clr : IN STD_LOGIC;
     clk : IN STD_LOGIC;
+	d   : IN STD_LOGIC_VECTOR(N-1 DOWNTO 0);
     q   : OUT STD_LOGIC_VECTOR(N-1 DOWNTO 0) 
 );
 END Reg;
