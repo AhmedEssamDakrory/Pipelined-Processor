@@ -50,11 +50,11 @@ BEGIN
 	interrupt_reg 	: FlipFlop generic map(1) port map(int, clr, clk, int, int_out);
 	rti_reg			: FlipFlop generic map(1) port map(rti, clr, clk, rti, rti_out);
 	enable_reg		: FlipFlop generic map(1) port map(enbl, clr, clk, enbl, enbl_out);
-	-- Register Signals
+	-- Register signals
 	rti 				<= '1' when op_code = "100" and instr_type = "11" else '0';
 	enbl 				<= int or rti;
 	-- Control signals
-	sub					<= '1' when (op_code = "011" and instr_type = "11") or (op_code = "000" and instr_type = "10") or int_out = '1' else '0';
+	sub					<= '1' when (op_code = "010" and instr_type = "11") or (op_code = "000" and instr_type = "10") or int_out = '1' else '0';
 	ea_immediate		<= '1' when (op_code = "011" or op_code = "100" ) and instr_type = "10" else '0';
 	mem_read			<= '1' when (op_code = "100" and instr_type = "10") or ((op_code = "001" or op_code = "101") and instr_type = "11") or rti_out = '1' else '0';
 	push_pop			<= '1' when op_code = "000" and instr_type = "10" else '0';
