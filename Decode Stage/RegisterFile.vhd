@@ -8,9 +8,12 @@ ENTITY RegisterFile IS
 	clr 			: IN STD_LOGIC;
 	address1		: IN STD_LOGIC_VECTOR(2 downto 0);
 	address2		: IN STD_LOGIC_VECTOR(2 downto 0);
-	write_address	: IN STD_LOGIC_VECTOR(2 downto 0);
-	write_reg		: IN STD_LOGIC;
-	write_data		: IN STD_LOGIC_VECTOR(31 downto 0);
+	write_address1	: IN STD_LOGIC_VECTOR(2 downto 0);
+	write_address2	: IN STD_LOGIC_VECTOR(2 downto 0);
+	write_reg1		: IN STD_LOGIC;
+	write_reg2		: IN STD_LOGIC;
+	write_data1		: IN STD_LOGIC_VECTOR(31 downto 0);
+	write_data2		: IN STD_LOGIC_VECTOR(31 downto 0);
 	data1			: OUT STD_LOGIC_VECTOR(31 downto 0);
 	data2			: OUT STD_LOGIC_VECTOR(31 downto 0)
 	
@@ -61,22 +64,31 @@ BEGIN
 			 out7;
 			 
 	-- Write Back
-	load0 <= '1' when write_reg = '1' and write_address = "000" else '0';
-	load1 <= '1' when write_reg = '1' and write_address = "001" else '0';
-	load2 <= '1' when write_reg = '1' and write_address = "010" else '0';
-	load3 <= '1' when write_reg = '1' and write_address = "011" else '0';
-	load4 <= '1' when write_reg = '1' and write_address = "100" else '0';
-	load5 <= '1' when write_reg = '1' and write_address = "101" else '0';
-	load6 <= '1' when write_reg = '1' and write_address = "110" else '0';
-	load7 <= '1' when write_reg = '1' and write_address = "111" else '0';
+	load0 <= '1' when (write_reg1 = '1' and write_address1 = "000") or (write_reg2 = '1' and write_address2 = "000") else '0';
+	load1 <= '1' when (write_reg1 = '1' and write_address1 = "001") or (write_reg2 = '1' and write_address2 = "001") else '0';
+	load2 <= '1' when (write_reg1 = '1' and write_address1 = "010") or (write_reg2 = '1' and write_address2 = "010") else '0';
+	load3 <= '1' when (write_reg1 = '1' and write_address1 = "011") or (write_reg2 = '1' and write_address2 = "011") else '0';
+	load4 <= '1' when (write_reg1 = '1' and write_address1 = "100") or (write_reg2 = '1' and write_address2 = "100") else '0';
+	load5 <= '1' when (write_reg1 = '1' and write_address1 = "101") or (write_reg2 = '1' and write_address2 = "101") else '0';
+	load6 <= '1' when (write_reg1 = '1' and write_address1 = "110") or (write_reg2 = '1' and write_address2 = "110") else '0';
+	load7 <= '1' when (write_reg1 = '1' and write_address1 = "111") or (write_reg2 = '1' and write_address2 = "111") else '0';
 	
-	in0 <= write_data when write_reg = '1' and write_address = "000";
-	in1 <= write_data when write_reg = '1' and write_address = "001";
-	in2 <= write_data when write_reg = '1' and write_address = "010";
-	in3 <= write_data when write_reg = '1' and write_address = "011";
-	in4 <= write_data when write_reg = '1' and write_address = "100";
-	in5 <= write_data when write_reg = '1' and write_address = "101";
-	in6 <= write_data when write_reg = '1' and write_address = "110";
-	in7 <= write_data when write_reg = '1' and write_address = "111";
+	in0 <= write_data1 when write_reg1 = '1' and write_address1 = "000";
+	in1 <= write_data1 when write_reg1 = '1' and write_address1 = "001";
+	in2 <= write_data1 when write_reg1 = '1' and write_address1 = "010";
+	in3 <= write_data1 when write_reg1 = '1' and write_address1 = "011";
+	in4 <= write_data1 when write_reg1 = '1' and write_address1 = "100";
+	in5 <= write_data1 when write_reg1 = '1' and write_address1 = "101";
+	in6 <= write_data1 when write_reg1 = '1' and write_address1 = "110";
+	in7 <= write_data1 when write_reg1 = '1' and write_address1 = "111";
+
+	in0 <= write_data2 when write_reg2 = '1' and write_address2 = "000";
+	in1 <= write_data2 when write_reg2 = '1' and write_address2 = "001";
+	in2 <= write_data2 when write_reg2 = '1' and write_address2 = "010";
+	in3 <= write_data2 when write_reg2 = '1' and write_address2 = "011";
+	in4 <= write_data2 when write_reg2 = '1' and write_address2 = "100";
+	in5 <= write_data2 when write_reg2 = '1' and write_address2 = "101";
+	in6 <= write_data2 when write_reg2 = '1' and write_address2 = "110";
+	in7 <= write_data2 when write_reg2 = '1' and write_address2 = "111";
 	
 END arch;
