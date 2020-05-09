@@ -46,7 +46,7 @@ u: for i in 0 to ((n/2)-1) generate
 	end generate;	
 end generate;
 
-cout <= c(3);
+cout <= c(n/2-1);
 	
 end str1;
 
