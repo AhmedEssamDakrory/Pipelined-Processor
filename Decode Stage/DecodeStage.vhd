@@ -29,6 +29,7 @@ ENTITY DecodeStage IS
 	sub					: OUT STD_LOGIC;
 	ea_immediate		: OUT STD_LOGIC;
 	mem_read			: OUT STD_LOGIC;
+	mem_write			: OUT STD_LOGIC;
 	push_pop			: OUT STD_LOGIC;
 	jz					: OUT STD_LOGIC;
 	jmp					: OUT STD_LOGIC;
@@ -70,6 +71,7 @@ ARCHITECTURE arch OF DecodeStage IS
 		sub					: OUT STD_LOGIC;
 		ea_immediate		: OUT STD_LOGIC;
 		mem_read			: OUT STD_LOGIC;
+		mem_write			: OUT STD_LOGIC;
 		push_pop			: OUT STD_LOGIC;
 		jz					: OUT STD_LOGIC;
 		jmp					: OUT STD_LOGIC;
@@ -133,7 +135,7 @@ ARCHITECTURE arch OF DecodeStage IS
 	SIGNAl SP_load, in_load : STD_LOGIC := '1';
 	SIGNAl add_sig, rst	: STD_LOGIC := '0';
 	-- Control signals
-	SIGNAl sub_sig, ea_immediate_sig, mem_read_sig, push_pop_sig, jz_sig, jmp_sig, flags_sig, 
+	SIGNAl sub_sig, ea_immediate_sig, mem_read_sig, mem_write_sig, push_pop_sig, jz_sig, jmp_sig, flags_sig, 
 		   flags_write_back_sig, pc_inc_sig, pc_write_back_sig, pc_disbale_sig, src1_sig, src2_sig,
 		   select_in_sig, swap_sig, mem_to_reg_sig, write_back_sig, out_port_sig,enable_sig :STD_LOGIC;
 	
@@ -143,7 +145,7 @@ ARCHITECTURE arch OF DecodeStage IS
 	SIGNAl two : STD_LOGIC_VECTOR(31 downto 0) := "00000000000000000000000000000010";
 BEGIN
 	control_unit	: ControlUnit port map (clk, clr, instr_type, op_code, int,  sub_sig, ea_immediate_sig, 
-											mem_read_sig, push_pop_sig, jz_sig, jmp_sig, flags_sig, flags_write_back_sig, 
+											mem_read_sig, mem_write_sig, push_pop_sig, jz_sig, jmp_sig, flags_sig, flags_write_back_sig, 
 											pc_inc_sig, pc_write_back_sig, pc_disbale_sig, src1_sig, src2_sig, select_in_sig,
 											swap_sig, mem_to_reg_sig, write_back_sig, out_port_sig, enable_sig);
 	register_file	: RegisterFile port map (clk, clr, address1, address2, write_address1, write_address2,	dest, 
@@ -166,6 +168,7 @@ BEGIN
 	sub					<= sub_sig and not disable;
 	ea_immediate		<= ea_immediate_sig and not disable;
 	mem_read			<= mem_read_sig and not disable;
+	mem_write			<= mem_write_sig and not disable;
 	push_pop			<= push_pop_sig and not disable;
 	jz					<= jz_sig and not disable;
 	jmp					<= jmp_sig and not disable;
