@@ -32,20 +32,20 @@ END Mem_Buffer;
 ARCHITECTURE arch_mem_buffer OF Mem_Buffer IS
 
 BEGIN
-    process(clk, rst)
+    process(clk)
     begin
-        if rst = '1' then
-            PcWrBack_out <= '0' ;
-            WbSig_out <= '0';
-            MemToRegSig_out <= '0';
-            OutPortSig_out <= '0';
-            SwapSig_out <= '0';
-            DstAddress_out <= (others => '0');
-            Src1Address_out <= (others => '0');
-            AluResult_out <= (others => '0');
-            DataFromMem_out <= (others => '0');
-        elsif falling_edge(clk) then
-            if Load = '1' then
+        if rising_edge(clk) then
+            if rst = '1' then
+                PcWrBack_out <= '0' ;
+                WbSig_out <= '0';
+                MemToRegSig_out <= '0';
+                OutPortSig_out <= '0';
+                SwapSig_out <= '0';
+                DstAddress_out <= (others => '0');
+                Src1Address_out <= (others => '0');
+                AluResult_out <= (others => '0');
+                DataFromMem_out <= (others => '0');
+            elsif Load = '1' then
                 PcWrBack_out <= PcWrBack_in ;
                 WbSig_out <= WbSig_in;
                 MemToRegSig_out <= MemToRegSig_in;

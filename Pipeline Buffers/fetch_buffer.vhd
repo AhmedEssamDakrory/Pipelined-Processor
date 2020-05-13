@@ -22,15 +22,15 @@ END Fetch_Buffer;
 ARCHITECTURE arch_fetch_buffer OF Fetch_Buffer IS
 
 BEGIN
-    process(clk, rst)
+    process(clk)
     begin
-        if rst = '1' then
-            instr_out <= (others => '0');
-            pc_out <= (others => '0');
-            disableForImmediate_out <= '0';
-            takenSigForBranch_out <= '0';
-        elsif falling_edge(clk) then
-            if Load = '1' then
+        if rising_edge(clk) then
+            if rst = '1' then
+                instr_out <= (others => '0');
+                pc_out <= (others => '0');
+                disableForImmediate_out <= '0';
+                takenSigForBranch_out <= '0';
+            elsif Load = '1' then
                 instr_out <= instr_in;
                 pc_out <= pc_in;
                 disableForImmediate_out <= disableForImmediate_in;

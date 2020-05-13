@@ -40,24 +40,24 @@ END ALU_Buffer;
 ARCHITECTURE arch_alu_buffer OF ALU_Buffer IS
 
 BEGIN
-    process(clk, rst)
+    process(clk)
     begin
-        if rst = '1' then
-            PcWrBack_out <= '0' ;
-            Read_Sig_out <= '0';
-            Write_Sig_out <= '0';
-            WbSig_out <= '0';
-            MemToRegSig_out <= '0';
-            OutPortSig_out <= '0';
-            SwapSig_out <= '0';
-            flagsOrSrc_out <= '0';
-            DstAddress_out <= (others => '0');
-            Src1Address_out <= (others => '0');
-            flags_out <= (others => '0');
-            AluResult_out <= (others => '0');
-            Rsrc2_out <= (others => '0');
-        elsif falling_edge(clk) then
-            if Load = '1' then
+        if rising_edge(clk) then
+            if rst = '1' then
+                PcWrBack_out <= '0' ;
+                Read_Sig_out <= '0';
+                Write_Sig_out <= '0';
+                WbSig_out <= '0';
+                MemToRegSig_out <= '0';
+                OutPortSig_out <= '0';
+                SwapSig_out <= '0';
+                flagsOrSrc_out <= '0';
+                DstAddress_out <= (others => '0');
+                Src1Address_out <= (others => '0');
+                flags_out <= (others => '0');
+                AluResult_out <= (others => '0');
+                Rsrc2_out <= (others => '0');
+           elsif Load = '1' then
                 PcWrBack_out <= PcWrBack_in;
                 Read_Sig_out <= Read_Sig_in;
                 Write_Sig_out <= Write_Sig_in;

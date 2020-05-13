@@ -15,12 +15,12 @@ END Reg;
 ARCHITECTURE arch_register OF Reg IS
 
 BEGIN
-    process(clk, clr)
+    process(clk)
     begin
-        if clr = '1' then
-            q <= (others => '0');
-        elsif rising_edge(clk) then
-            if Load = '1' then
+        if rising_edge(clk) then
+            if clr = '1' then
+                q <= (others => '0');
+            elsif Load = '1' then
                 q <= d;
             end if;
         end if;

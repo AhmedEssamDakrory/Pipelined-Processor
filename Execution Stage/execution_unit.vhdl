@@ -26,11 +26,11 @@ architecture ExecutionArch of Execution is
     Signal ResultSignal : std_logic_vector (31 downto 0);
     begin
       Mux2_1 :entity work.Mux2(arch_mux2) generic map(N=>32) port map(Temp,ImmConcatenate,Extend,B);
-      Mux2_2 :entity work.Mux2(arch_mux2) generic map(N=>32) port map(TempFlags,FlagsFromMem,ALUWriteFlag,FlagRegisterOutput);
+      Mux2_2 :entity work.Mux2(arch_mux2) generic map(N=>4) port map(TempFlags,FlagsFromMem,ALUWriteFlag,FlagRegisterOutput);
       Mux2_3 :entity work.Mux2(arch_mux2) generic map(N=>32) port map(ResultSignal,RSrc2,Taken,BrnchTakenOutput);
       Mux8_1 :entity work.Mux8(arch_mux8) generic map(N=>32) port map(Data1,RDestAlu,RDestMem,SrcAlu,SrcMem,ForwardData1,A);
       Mux8_2 :entity work.Mux8(arch_mux8) generic map(N=>32) port map(Data2,RDestAlu,RDestMem,SrcAlu,SrcMem,ForwardData2,Temp);
-      Reg  :entity work.Reg(arch_register) generic map(N=>4) port map(FlagRegisterOutput,'1','0',clk,FlagOutput);
+      Reg  :entity work.Reg(arch_register) generic map(N=>4) port map('1','0',clk,FlagRegisterOutput,FlagOutput);
       ALU :entity work.ALU(ALU_arcitecture) generic map(N=>32) port map(Operation,TempFlags,A,B,ResultSignal);
       Result<=ResultSignal;
       
