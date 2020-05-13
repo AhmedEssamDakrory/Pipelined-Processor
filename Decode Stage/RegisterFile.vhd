@@ -10,12 +10,15 @@ ENTITY RegisterFile IS
 	address2		: IN STD_LOGIC_VECTOR(2 downto 0);
 	write_address1	: IN STD_LOGIC_VECTOR(2 downto 0);
 	write_address2	: IN STD_LOGIC_VECTOR(2 downto 0);
+	dest			: IN STD_LOGIC_VECTOR(2 downto 0);
 	write_reg1		: IN STD_LOGIC;
 	write_reg2		: IN STD_LOGIC;
 	write_data1		: IN STD_LOGIC_VECTOR(31 downto 0);
 	write_data2		: IN STD_LOGIC_VECTOR(31 downto 0);
+	
 	data1			: OUT STD_LOGIC_VECTOR(31 downto 0);
-	data2			: OUT STD_LOGIC_VECTOR(31 downto 0)
+	data2			: OUT STD_LOGIC_VECTOR(31 downto 0);
+	Rdst			: OUT STD_LOGIC_VECTOR(31 downto 0)
 	
 );
 END RegisterFile;
@@ -61,6 +64,14 @@ BEGIN
 			 out4 when address2 = "100" else
 			 out5 when address2 = "101" else
 			 out6 when address2 = "110" else
+			 out7;
+	Rdst <=  out0 when dest = "000" else
+			 out1 when dest = "001" else
+			 out2 when dest = "010" else
+			 out3 when dest = "011" else
+			 out4 when dest = "100" else
+			 out5 when dest = "101" else
+			 out6 when dest = "110" else
 			 out7;
 			 
 	-- Write Back
