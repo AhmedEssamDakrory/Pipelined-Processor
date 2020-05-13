@@ -48,9 +48,9 @@ SIGNAL rti, enbl, int_out, rti_out, enbl_out, pc_disbale_sig, counter_rst	: STD_
 SIGNAL counter																: STD_LOGIC_VECTOR(1 downto 0);
 
 BEGIN
-	interrupt_ff 	: FlipFlop generic map(1) port map(int, clr, clk, int, int_out);
-	rti_ff			: FlipFlop generic map(1) port map(rti, clr, clk, rti, rti_out);
-	enable_ff		: FlipFlop generic map(1) port map(enbl, clr, clk, enbl, enbl_out);
+	interrupt_ff 	: FlipFlop port map(int, clr, clk, int, int_out);
+	rti_ff			: FlipFlop  port map(rti, clr, clk, rti, rti_out);
+	enable_ff		: FlipFlop  port map(enbl, clr, clk, enbl, enbl_out);
 	-- Register signals
 	rti 				<= '1' when op_code = "100" and instr_type = "11" else '0';
 	enbl 				<= int or rti;
