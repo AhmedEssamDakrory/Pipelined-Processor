@@ -32,13 +32,13 @@ begin
   begin
       if we = '1' then
         if( mem_procsseor = '1')then
-			cache_mem(to_integer(unsigned(index))) (to_integer(unsigned(offset)) + N - 1 Downto  to_integer(unsigned(offset))) <= datain_processor;
+			cache_mem(to_integer(unsigned(index))) (to_integer(unsigned(offset) * 8) + N - 1 Downto  to_integer(unsigned(offset)) * 8) <= datain_processor;
 		else
 			cache_mem(to_integer(unsigned(index))) <= datain_mem;
 		end if;
 	  end if;
   end process;
 
-	dataout_prcosseor <= cache_mem(to_integer(unsigned(index))) (to_integer(unsigned(offset)) + N - 1 Downto  to_integer(unsigned(offset)));
+	dataout_prcosseor <= cache_mem(to_integer(unsigned(index))) (to_integer(unsigned(offset) *8) + N - 1 Downto  to_integer(unsigned(offset)) * 8);
 	dataout_mem <=  cache_mem(to_integer(unsigned(index)));
 end architecture RTL;
