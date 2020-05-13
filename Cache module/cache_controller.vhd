@@ -174,6 +174,8 @@ begin
 					out_address_data <= '1' & address_data(10 downto 3) & "000" ;  
 				end if;
 			end if;
+			else
+				stall_mem <= '0';
 		end if;
 	end process;
 	
@@ -258,6 +260,8 @@ begin
 					out_address_inst <= '0' & address_data(10 downto 3) & "000" ;  
 				end if;
 			end if;
+			else
+				stall_inst = '0';
 		end if;
 	end process;
 	
