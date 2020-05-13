@@ -17,6 +17,7 @@ ENTITY Mem_Buffer IS
     Src1Address_in:in std_logic_vector (2 downto 0);
     AluResult_in:in std_logic_vector (31 downto 0);
     DataFromMem_in:in std_logic_vector (31 downto 0);
+	Rsrc2_in:in std_logic_vector (31 downto 0);
     
     PcWrBack_out:out std_logic;
     WbSig_out:out std_logic;
@@ -26,7 +27,8 @@ ENTITY Mem_Buffer IS
     DstAddress_out:out std_logic_vector (2 downto 0);
     Src1Address_out:out std_logic_vector (2 downto 0);
     AluResult_out:out std_logic_vector (31 downto 0);
-    DataFromMem_out:out std_logic_vector (31 downto 0)
+    DataFromMem_out:out std_logic_vector (31 downto 0);
+	  Rsrc2_out:out std_logic_vector (31 downto 0)
 );
 END Mem_Buffer;
 ARCHITECTURE arch_mem_buffer OF Mem_Buffer IS
@@ -45,6 +47,7 @@ BEGIN
                 Src1Address_out <= (others => '0');
                 AluResult_out <= (others => '0');
                 DataFromMem_out <= (others => '0');
+				        Rsrc2_out <= (others => '0');
             elsif Load = '1' then
                 PcWrBack_out <= PcWrBack_in ;
                 WbSig_out <= WbSig_in;
@@ -55,6 +58,7 @@ BEGIN
                 Src1Address_out <= Src1Address_in;
                 AluResult_out <= AluResult_in;
                 DataFromMem_out <= DataFromMem_in;
+				Rsrc2_out <= Rsrc2_in;
             end if;
         end if;
     end process;

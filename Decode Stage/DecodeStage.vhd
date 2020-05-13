@@ -138,7 +138,7 @@ ARCHITECTURE arch OF DecodeStage IS
 		   flags_write_back_sig, pc_inc_sig, pc_write_back_sig, pc_disbale_sig, src1_sig, src2_sig,
 		   select_in_sig, swap_sig, mem_to_reg_sig, write_back_sig, out_port_sig,enable_sig :STD_LOGIC;
 	
-	SIGNAl data1_sig, data2_sig, pc_sig, PC_out, PC_incremented,in_port_out, out_port_out, SP_curr,
+	SIGNAl data1_sig, data2_sig, PC_out, PC_incremented,in_port_out, out_port_out, SP_curr,
 		   SP_in, SP_out, SP_incremented, temp : STD_LOGIC_VECTOR(31 downto 0);
 	SIGNAl one : STD_LOGIC_VECTOR(31 downto 0) := "00000000000000000000000000000001";
 	SIGNAl two : STD_LOGIC_VECTOR(31 downto 0) := "00000000000000000000000000000010";

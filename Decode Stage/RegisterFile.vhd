@@ -84,22 +84,30 @@ BEGIN
 	load6 <= '1' when (write_reg1 = '1' and write_address1 = "110") or (write_reg2 = '1' and write_address2 = "110") else '0';
 	load7 <= '1' when (write_reg1 = '1' and write_address1 = "111") or (write_reg2 = '1' and write_address2 = "111") else '0';
 	
-	in0 <= write_data1 when write_reg1 = '1' and write_address1 = "000";
-	in1 <= write_data1 when write_reg1 = '1' and write_address1 = "001";
-	in2 <= write_data1 when write_reg1 = '1' and write_address1 = "010";
-	in3 <= write_data1 when write_reg1 = '1' and write_address1 = "011";
-	in4 <= write_data1 when write_reg1 = '1' and write_address1 = "100";
-	in5 <= write_data1 when write_reg1 = '1' and write_address1 = "101";
-	in6 <= write_data1 when write_reg1 = '1' and write_address1 = "110";
-	in7 <= write_data1 when write_reg1 = '1' and write_address1 = "111";
+	in0 <= write_data1 when write_reg1 = '1' and write_address1 = "000" else
+		   write_data2 when write_reg2 = '1' and write_address2 = "000" else
+		   (others => 'Z');
+	in1 <= write_data1 when write_reg1 = '1' and write_address1 = "001" else
+		   write_data2 when write_reg2 = '1' and write_address2 = "001" else
+		   (others => 'Z');
+	in2 <= write_data1 when write_reg1 = '1' and write_address1 = "010" else
+		   write_data2 when write_reg2 = '1' and write_address2 = "010" else
+		   (others => 'Z');
+	in3 <= write_data1 when write_reg1 = '1' and write_address1 = "011" else
+		   write_data2 when write_reg2 = '1' and write_address2 = "011" else
+		   (others => 'Z');
+	in4 <= write_data1 when write_reg1 = '1' and write_address1 = "100" else
+		   write_data2 when write_reg2 = '1' and write_address2 = "100" else
+		   (others => 'Z');
+	in5 <= write_data1 when write_reg1 = '1' and write_address1 = "101" else
+		   write_data2 when write_reg2 = '1' and write_address2 = "101" else
+		   (others => 'Z');
+	in6 <= write_data1 when write_reg1 = '1' and write_address1 = "110" else
+		   write_data2 when write_reg2 = '1' and write_address2 = "110" else
+		   (others => 'Z');
+	in7 <= write_data1 when write_reg1 = '1' and write_address1 = "111" else
+		   write_data2 when write_reg2 = '1' and write_address2 = "111" else
+		   (others => 'Z');
 
-	in0 <= write_data2 when write_reg2 = '1' and write_address2 = "000";
-	in1 <= write_data2 when write_reg2 = '1' and write_address2 = "001";
-	in2 <= write_data2 when write_reg2 = '1' and write_address2 = "010";
-	in3 <= write_data2 when write_reg2 = '1' and write_address2 = "011";
-	in4 <= write_data2 when write_reg2 = '1' and write_address2 = "100";
-	in5 <= write_data2 when write_reg2 = '1' and write_address2 = "101";
-	in6 <= write_data2 when write_reg2 = '1' and write_address2 = "110";
-	in7 <= write_data2 when write_reg2 = '1' and write_address2 = "111";
 	
 END arch;

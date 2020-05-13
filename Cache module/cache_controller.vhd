@@ -175,6 +175,7 @@ begin
 				end if;
 			end if;
 			else
+				data_out_mem_stage <= (others => '0');
 				stall_mem <= '0';
 		end if;
 	end process;
@@ -261,7 +262,8 @@ begin
 				end if;
 			end if;
 			else
-				stall_inst = '0';
+				stall_inst <= '0';
+				data_out_inst_stage <= (others => '0');
 		end if;
 	end process;
 	
