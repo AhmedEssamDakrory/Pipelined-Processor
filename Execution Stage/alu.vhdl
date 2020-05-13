@@ -48,7 +48,7 @@ begin
         elsif (Operation(4)='0' and Operation(3)='1') then  -- Two Operand
             case(Operation(2 downto 0)) is
                 when "000" => -- Swap
-                ResultSignal <= (others => '0'); 
+                ResultSignal <= '0' & A ; 
                 when "001" => -- A+B
                 ResultSignal <= '0' & std_logic_vector(signed(A)+signed(B));
                 when "010" => --A+B
