@@ -1,3 +1,4 @@
+
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.std_logic_arith.ALL;
@@ -48,9 +49,9 @@ SIGNAL rti, enbl, int_out, rti_out, enbl_out, pc_disbale_sig, counter_rst	: STD_
 SIGNAL counter																: STD_LOGIC_VECTOR(1 downto 0);
 
 BEGIN
-	interrupt_ff 	: FlipFlop port map(int, clr, clk, int, int_out);
-	rti_ff			: FlipFlop  port map(rti, clr, clk, rti, rti_out);
-	enable_ff		: FlipFlop  port map(enbl, clr, clk, enbl, enbl_out);
+	interrupt_ff 	: FlipFlop generic map(1) port map(int, clr, clk, int, int_out);
+	rti_ff			: FlipFlop generic map(1) port map(rti, clr, clk, rti, rti_out);
+	enable_ff		: FlipFlop generic map(1) port map(enbl, clr, clk, enbl, enbl_out);
 	-- Register signals
 	rti 				<= '1' when op_code = "100" and instr_type = "11" else '0';
 	enbl 				<= int or rti;
@@ -70,7 +71,7 @@ BEGIN
 	select_in			<= '1' when op_code = "101" and instr_type = "00" else '0';
 	swap				<= '1' when op_code = "000" and instr_type = "01" else '0';
 	mem_to_reg			<= '1' when instr_type = "01" or instr_type = "10" else '0';
-	write_back			<= '1' when instr_type = "01" or (instr_type = "10" and (op_code = "001" or op_code = "010" or op_code = "011")) else '0';
+	write_back			<= '1' when instr_type = "01" or (instr_type = "00" and (op_code = "001" or op_code = "010" or op_code = "011")) or (instr_type = "10" and (op_code = "001" or op_code = "010" or op_code = "011")) else '0';
 	out_port			<= '1' when op_code = "100" and instr_type = "00" else '0';
 	enable				<= '1' when int = '1' or enbl_out = '1' or (instr_type = "10" and (op_code = "000" or op_code = "001") ) or (instr_type = "11" and (op_code = "100" or op_code = "011" or op_code = "010")) else '0'; 
 	flags				<= '1' when int_out = '1' else '0';
