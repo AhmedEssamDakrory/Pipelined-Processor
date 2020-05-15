@@ -6,6 +6,7 @@ use IEEE.Numeric_Std.all;
 entity BranchPredictionBuffer is
   port (
     clk	    	  : in  std_logic;
+    Instruction : in  std_logic_vector(15 downto 0);
     BranchPc    : in std_logic_vector(12 downto 0);
     input       : in  std_logic;	-- Taken = 1 , Not Taken = 0
     we,rst      : in std_logic; -- write 1 , read 0
@@ -30,22 +31,22 @@ begin
         PredictionBuffer<=(others=>X"0000");
     else
         if rising_edge(clk) then
+          if (Instruction(15) and Instruction(14))='1' --Memory Instruction
             if we ='1' then
               if  PredictionBuffer(to_integer("000"&UNSIGNED(BranchPc)))=x"0000" and input='0' then
                   PredictionBuffer(to_integer("000"&UNSIGNED(BranchPc)))<="101"&BranchPc;
                   output<=PredictionBuffer(to_integer("000"&UNSIGNED(BranchPc)))(15);
               else
                  temp<=PredictionBuffer(to_integer("000"&UNSIGNED(BranchPc)));
-                 fsm_input<=to_Integer(UNSIGNED(temp(1 downto 0)));
+                 fsm_input<=to_Integer(UNSIGNED(temp(14 downto 13)));
                  PredictionBuffer(to_integer("000"&UNSIGNED(BranchPc)))<=input&std_logic_vector(to_unsigned(fsm_output,2))&BranchPc;
                  output<=PredictionBuffer(to_integer("000"&UNSIGNED(BranchPc)))(15);
               end if;
             else
               output<= PredictionBuffer(to_integer("000"&UNSIGNED(BranchPc)))(15);
             end if;
+          end if;
         end if;
     end if;
 	end process;
-
-
 end architecture ArchOfBranchPredictionBuffer;

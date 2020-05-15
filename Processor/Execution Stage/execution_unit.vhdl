@@ -16,6 +16,7 @@ entity Execution is
         Taken : in std_logic;
 
         FlagOutput:out std_logic_vector(3 downto 0);
+        PredictionResult : out std_logic;
         Result,BrnchTakenOutput :out std_logic_vector(31 downto 0)
     );
 end Execution;
@@ -33,5 +34,6 @@ architecture ExecutionArch of Execution is
       Reg  :entity work.Reg(arch_register) generic map(N=>4) port map('1','0',clk,FlagRegisterOutput,FlagOutput);
       ALU :entity work.ALU(ALU_arcitecture) generic map(N=>32) port map(Operation,TempFlags,A,B,ResultSignal);
       Result<=ResultSignal;
+      PredictionResult<= '1' when (Unsigned(Operation)="11000" and FlagRegisterOutput(0)='1' ) else '0';
       
 end ExecutionArch;
