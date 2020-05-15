@@ -46,11 +46,12 @@ architecture fsm of cache_controller is
 	);
 	end component;
 
-	type cache_control is array (0 to 31) of std_logic_vector(4 Downto 0);
+	type cache_control_inst is array (0 to 31) of std_logic_vector(4 Downto 0);
+	type cache_control_data is array (0 to 31) of std_logic_vector(5 Downto 0);
 	type state_type is (IDLE , WRITE_TO_MEM , READ_FROM_MEM );
 
-	signal data_control 																: cache_control	:= ((others=> (others=>'0'))); -- valid  dirty  tag
-	signal inst_control 																: cache_control := ((others=> (others=>'0')));
+	signal data_control 																: cache_control_data	:= ((others=> (others=>'0'))); -- valid  dirty  tag
+	signal inst_control 																: cache_control_inst := ((others=> (others=>'0')));
 	signal current_state_data , next_state_data, current_state_inst, next_state_inst 	: state_type := IDLE ;
 	signal mem_procsseor_data, mem_procsseor_inst										: std_logic;
 	signal data_out_mem																	: std_logic_vector(127 downto 0);
@@ -115,25 +116,25 @@ begin
 			offset_data := address_data(1 downto 0);
 			if( current_state_data = IDLE) then
 				if(write_data = '1')then
-					if( data_control(to_integer(unsigned(index_data)))(2 downto 0)  =  tag_data    
-														and  data_control(to_integer(unsigned(index_data)))(4) = '1')then	-- my tag and data is valid
+					if( data_control(to_integer(unsigned(index_data)))(3 downto 0)  =  tag_data    
+														and  data_control(to_integer(unsigned(index_data)))(5) = '1')then	-- my tag and data is valid
 						stall_mem <= '0';
 						we_cache_data <= '1';
 						mem_procsseor_data <= '1';
 						data_out_cache_data	<= data_in_mem_stage;
-						data_control(to_integer(unsigned(index_data)))(3) <= '1';
+						data_control(to_integer(unsigned(index_data)))(4) <= '1';
 					else 		
 						stall_mem <= '1';
 						we_cache_data <= '0';
-						if data_control(to_integer(unsigned(index_data)))(3) = '1' then	-- current data is dirty
+						if data_control(to_integer(unsigned(index_data)))(4) = '1' then	-- current data is dirty
 							next_state_data <= WRITE_TO_MEM; 
 						else 
 							next_state_data <= READ_FROM_MEM;
 						end if;
 					end if;
 				elsif( read_data = '1')then
-					if( data_control(to_integer(unsigned(index_data)))(2 downto 0)  =  tag_data    
-														and  data_control(to_integer(unsigned(index_data)))(4) = '1')then	-- my tag and data is valid
+					if( data_control(to_integer(unsigned(index_data)))(3 downto 0)  =  tag_data    
+														and  data_control(to_integer(unsigned(index_data)))(5) = '1')then	-- my tag and data is valid
 						stall_mem <= '0';
 						we_cache_data <= '0';
 						mem_procsseor_data <= '1';
@@ -141,7 +142,7 @@ begin
 						next_state_data <= IDLE;
 					else 		
 						stall_mem <= '1';
-						if data_control(to_integer(unsigned(index_data)))(3) = '1' then	-- current data is dirty
+						if data_control(to_integer(unsigned(index_data)))(4) = '1' then	-- current data is dirty
 							next_state_data <= WRITE_TO_MEM; 
 						else 
 							next_state_data <= READ_FROM_MEM;
@@ -157,7 +158,7 @@ begin
 					we_ram_data <= '1';
 					enable_ram_data <= '1' ;
 					mem_procsseor_data <= '0';
-					out_address_data <= '1' & data_control(to_integer(unsigned(index_data) ))(2 downto 0) & index_data & "000" ;			
+					out_address_data <= '1' & data_control(to_integer(unsigned(index_data)))(3 downto 0) & index_data & "00" ;			
 					data_in_mem <= data_in_cache_mem_data; 
 				end if;
 			elsif current_state_data = READ_FROM_MEM then
@@ -172,7 +173,7 @@ begin
 				else 
 					we_ram_data <= '0';
 					enable_ram_data <= '1' ;
-					out_address_data <= '1' & address_data(10 downto 3) & "000" ;  
+					out_address_data <= '1' & address_data(10 downto 2) & "00" ;  
 				end if;
 			end if;
 			else
