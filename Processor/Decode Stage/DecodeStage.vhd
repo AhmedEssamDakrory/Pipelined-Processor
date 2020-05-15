@@ -8,6 +8,8 @@ ENTITY DecodeStage IS
 	instr_type			: IN STD_LOGIC_VECTOR(1 downto 0);
 	op_code				: IN STD_LOGIC_VECTOR(2 downto 0);
 	int					: IN STD_LOGIC;
+	stall_sp            : IN STD_LOGIC;
+	
 	disable				: IN STD_LOGIC;
 	address1			: IN STD_LOGIC_VECTOR(2 downto 0);
 	address2			: IN STD_LOGIC_VECTOR(2 downto 0);
@@ -156,8 +158,8 @@ BEGIN
 	input_port 		: Reg port map(in_load, clr, not_clk, port_in, in_port_out);
 	output_port 	: Reg port map(out_port_sig, clr, not_clk, write_data1, out_port_out);
 	
-	SP_incremented <= std_logic_vector(unsigned(SP_curr) + unsigned(one));
-	pass_inc_sp		: Mux2 port map(SP_curr, SP_incremented, push_pop_sig, SP_out);
+	SP_incremented <= std_logic_vector(unsigned(SP_in) + unsigned(one));
+	pass_inc_sp		: Mux2 port map(SP_incremented,SP_in, push_pop_sig, SP_out);
 	
 	PC_incremented <= std_logic_vector(unsigned(PC) + unsigned(one));
 	pass_inc_pc		: Mux2 port map(PC, PC_incremented, pc_inc_sig, PC_out);
@@ -186,26 +188,30 @@ BEGIN
 	write_back			<= write_back_sig and not disable;
 	out_port			<= out_port_sig and not disable;
 	enable				<= enable_sig and not disable;
-	SP_load				<= '1' when ((op_code = "000" or op_code = "001") and instr_type = "10") or ((op_code = "010" or op_code = "011" or op_code = "100") and instr_type = "11") else '0';
+	SP_load				<= '1' when stall_sp = '1' and ( ((op_code = "000" or op_code = "001") and instr_type = "10") or ((op_code = "010" or op_code = "011" or op_code = "100") and instr_type = "11") ) else '0';
 	
 	-- Adder/Subtractor of stack pointer
 	PROCESS (sub_sig, SP_load, op_code, instr_type, SP_curr, clr) 	
-	BEGIN   	
-	    if (sub_sig = '1') then
-			if(op_code = "000" and instr_type = "10")then
-				SP_in <= std_logic_vector(unsigned(SP_curr) + unsigned(std_logic_vector(unsigned(not(one)) + 1)));
+	BEGIN
+		if(sp_load = '1') then
+			 if (sub_sig = '1') then
+				if(op_code = "000" and instr_type = "10")then
+					SP_in <= std_logic_vector(unsigned(SP_curr) + unsigned(std_logic_vector(unsigned(not(one)) + 1)));
+				else
+					SP_in <= std_logic_vector(unsigned(SP_curr) + unsigned(std_logic_vector(unsigned(not(two)) + 1)));
+				end if;
+			elsif clr='1' then 
+				SP_in <= "11111111111111111111111111111111";
 			else
-				SP_in <= std_logic_vector(unsigned(SP_curr) + unsigned(std_logic_vector(unsigned(not(two)) + 1)));
-			end if;
-		elsif (SP_load = '1') then
-			if(op_code = "001" and instr_type = "10")then
-				SP_in <= std_logic_vector(unsigned(SP_curr) + unsigned(one));
-			else
-				SP_in <= std_logic_vector(unsigned(SP_curr) + unsigned(two));
-			end if;
-		elsif clr='1' then 
-			SP_in <= "11111111111111111111111111111111";
-	    end if;     
+				if(op_code = "001" and instr_type = "10")then
+					SP_in <= std_logic_vector(unsigned(SP_curr) + unsigned(one));
+				else
+					SP_in <= std_logic_vector(unsigned(SP_curr) + unsigned(two));
+				end if;
+			end if;     
+		end if;
+		
+	   
 	END PROCESS;
 	
 END arch;

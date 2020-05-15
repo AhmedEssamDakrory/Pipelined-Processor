@@ -70,6 +70,7 @@ architecture MainArchitecture of Main is
     Signal ImmConcatenate          :std_logic_vector(31 downto 0);
     Signal FlagOutput              :std_logic_vector(3 downto 0);             
     Signal Result,BrnchTakenOutput :std_logic_vector(31 downto 0);
+	signal prediction_out : std_logic;
 
     -- Alu forward Unit
     Signal src1_sel_forward_alu,src2_sel_forward_alu :std_logic_vector(2 downto 0);
@@ -117,7 +118,7 @@ begin
         end if;
     end process;
     --Decode Stage
-    Decode_Unit :entity work.DecodeStage(arch) port map(clk,rst,instr_out(15 downto 14),instr_out(13 downto 11),int,disableForImmediate_out,
+    Decode_Unit :entity work.DecodeStage(arch) port map(clk,rst,instr_out(15 downto 14),instr_out(13 downto 11),int,load_fetch_buffer,disableForImmediate_out,
     instr_out(7 downto 5),instr_out(4 downto 2),DstAddress_out,Src1Address_out,instr_out(10 downto 8),WbSig_out,SwapSig_out,wb_mux_output,Rsrc2_out,
     pc_out,port_in,data1,data2,Rdst,port_out,sub,ea_immediate,mem_read,mem_write,push_pop,jz,jmp,flags,flags_write_back,pc_inc,pc_write_back,int_ret_flush,src1,src2,select_in,	
     swap,mem_to_reg,write_back,out_port,enable);
@@ -154,7 +155,7 @@ begin
     Operation<=typeOfInstr_out_decode&opcode_out_decode;
     Execution_Stage :entity work.Execution(ExecutionArch) port map(data1_out_decode,data2_out_decode,AluResult_out_alu, wb_mux_output,ImmConcatenate,
     data2_out_decode,Rsrc2_out_alu,Rsrc2_out,Operation,DataFromMem_out(3 downto 0),src1_sel_forward_alu,src2_sel_forward_alu,clk,ExtendSig_out_decode,
-    ALU_WrFlagSig_out_decode,TakenSigForBranch_out_decode,FlagOutput,Result,BrnchTakenOutput);
+    ALU_WrFlagSig_out_decode,TakenSigForBranch_out_decode,FlagOutput,prediction_out,Result,BrnchTakenOutput);
 
     --Wrong prediction signals 
     flush_wrong_prediction <= (FlagOutput(0) xnor (not TakenSigForBranch_out_decode)) and JzSig_out_decode;
@@ -186,7 +187,7 @@ begin
     DstAddress_out_alu,Src1Address_out_decode,DstAddress_out_decode,WbSig_out_alu,WbSig_out_decode,SwapSig_out_alu,SwapSig_out_decode,Rdest_sel);
 
     --Memory stage
-    Memory_Stage :entity work.memory_stage(structural) port map(flagsOrSrc_out_alu,SwapSig_out_alu,to_mem,data,AluResult_out_alu,data_out_mem_stage,
+    Memory_Stage :entity work.memory_stage(structural) port map(flagsOrSrc_out_alu,SwapSig_out_alu,to_mem,data,Rsrc2_out_alu,data_out_mem_stage,
     FlagOutput(2 downto 0));
 
     --Memory Buffer

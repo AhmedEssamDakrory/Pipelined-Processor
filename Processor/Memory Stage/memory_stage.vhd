@@ -16,7 +16,7 @@ architecture structural of memory_stage is
 	
 begin
 	
-	to_mem <= Rsrc2_in when flags_src = '1' else 
+	to_mem <= Rsrc2_in when flags_src = '0' else 
 				"00000000000000000000000000000"& flags;
 	 
 	data <= from_mem when swap = '0' else

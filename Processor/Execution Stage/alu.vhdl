@@ -59,14 +59,15 @@ begin
                 ResultSignal <= '0' & (A and B) ;
                 when "101" => --Or
                 ResultSignal <= '0' & (A or B );
-                when "110" => --SHR
+                when "111" => --SHR
                 ResultSignal <= '0' & std_logic_vector(unsigned(A) srl to_integer(unsigned(B)));
-                when "111" => --SHL
+                when "110" => --SHL
                 ResultSignal <= '0' & std_logic_vector(unsigned(A) sll to_integer(unsigned(B)));
                 when others => ResultSignal <= (others => '0');
             end case;
          elsif (Operation(4)='1' and Operation(3)='0') then  -- Memory
             case(Operation(2 downto 0)) is
+				when "000" => ResultSignal <= '0' & A;
                 when others => ResultSignal <= '0' & B ;
             end case;
         end if;    
