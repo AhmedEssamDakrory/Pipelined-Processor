@@ -15,7 +15,6 @@ architecture MainArchitecture of Main is
     signal load_hazard_stall,fetch_hazard_flush,int_ret_flush,cache_stall_mem,cache_stall_fetch,taken_sel,wrong_pred_sel,write_back_sel :std_logic;
     signal Rdest_sel 	:	std_logic_vector(2 downto 0);
     Signal pc	: 	std_logic_vector(31 downto 0);
-    Signal address_data  : std_logic_vector(10 downto 0);
 
     --Memory buffer signals
     Signal PcWrBack_out,WbSig_out,MemToRegSig_out,OutPortSig_out,SwapSig_out    :std_logic;
@@ -85,7 +84,7 @@ architecture MainArchitecture of Main is
 
 begin
     --Cache Controller
-    Cache_Controller :entity work.cache_controller(fsm) port map(clk,rst,address_data,pc(10 downto 0),Write_Sig_out_alu,'0',
+    Cache_Controller :entity work.cache_controller(fsm) port map(clk,rst, AluResult_out_alu(10 downto 0) ,pc(10 downto 0),Write_Sig_out_alu,'0',
     Read_Sig_out_alu,'1',cache_stall_mem,cache_stall_fetch,to_mem,(others=>'0'),data_out_mem_stage,data_out_inst_stage);
     --Fetch Stage
     Fetch_Stage :entity work.fetch_stage(structural) port map(clk,rst,load_hazard_stall,fetch_hazard_flush,int_ret_flush,cache_stall_mem,cache_stall_fetch
@@ -132,13 +131,13 @@ begin
     unCondSig_out_decode,flagsOrSrc_out_decode,typeOfInstr_out_decode,opcode_out_decode,Src1Address_out_decode,Src2Address_out_decode,DstAddress_out_decode,
     EA_4_bits_out_decode,data1_out_decode,data2_out_decode);
 
-    process(cache_stall_mem,flush_wrong_prediction,disableForImmediate_out)
+    process(cache_stall_mem,flush_wrong_prediction,disableForImmediate_out,cache_stall_fetch)
     begin
             --Flush  and stall signals
-        if cache_stall_mem='1'  then
+        if cache_stall_mem='1' then
             decode_stall<='0';
             decode_flush<='0';
-        elsif flush_wrong_prediction='1' then
+        elsif flush_wrong_prediction='1' or cache_stall_fetch = '1' then
             decode_stall<='1';
             decode_flush<='1';
         elsif disableForImmediate_out='1' then
@@ -154,7 +153,7 @@ begin
     --Execution Stage
     Operation<=typeOfInstr_out_decode&opcode_out_decode;
     Execution_Stage :entity work.Execution(ExecutionArch) port map(data1_out_decode,data2_out_decode,AluResult_out_alu, wb_mux_output,ImmConcatenate,
-    data2_out_decode,Rsrc2_out_alu,AluResult_out,Operation,DataFromMem_out(3 downto 0),src1_sel_forward_alu,src2_sel_forward_alu,clk,ExtendSig_out_decode,
+    data2_out_decode,Rsrc2_out_alu,Rsrc2_out,Operation,DataFromMem_out(3 downto 0),src1_sel_forward_alu,src2_sel_forward_alu,clk,ExtendSig_out_decode,
     ALU_WrFlagSig_out_decode,TakenSigForBranch_out_decode,FlagOutput,Result,BrnchTakenOutput);
 
     --Wrong prediction signals 

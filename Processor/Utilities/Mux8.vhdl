@@ -17,7 +17,7 @@ begin
   b <= a1 when (sel = "000") else
        a2 when (sel = "001") else
        a3 when (sel = "010") else
-       a4 when (sel = "011") else
-       a5 when (sel = "100") else
+       a4 when (sel = "100") else
+       a5 when (sel = "011") else
        (others => 'Z');
 end arch_mux8;
