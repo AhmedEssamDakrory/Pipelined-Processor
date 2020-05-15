@@ -156,10 +156,10 @@ BEGIN
 	input_port 		: Reg port map(in_load, clr, not_clk, port_in, in_port_out);
 	output_port 	: Reg port map(out_port_sig, clr, not_clk, write_data1, out_port_out);
 	
-	inc_sp			: Adder port map (clk, rst, enable_sig, push_pop_sig, SP_curr, one, SP_incremented);
+	SP_incremented <= std_logic_vector(unsigned(SP_curr) + unsigned(one));
 	pass_inc_sp		: Mux2 port map(SP_curr, SP_incremented, push_pop_sig, SP_out);
 	
-	inc_pc			: Adder port map (clk, rst, pc_inc_sig, add_sig, PC, one, PC_incremented);
+	PC_incremented <= std_logic_vector(unsigned(PC) + unsigned(one));
 	pass_inc_pc		: Mux2 port map(PC, PC_incremented, pc_inc_sig, PC_out);
 	
 	data1_sp		: Mux2 port map(SP_out, data1_sig, src1_sig,temp);

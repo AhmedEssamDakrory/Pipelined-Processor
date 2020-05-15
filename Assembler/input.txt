@@ -1,0 +1,10 @@
+.ORG 0
+0
+.ORG 0  
+0
+.ORG 0
+inc r2
+add r3,r2,r2
+iadd r4,r2,0003
+swap r2,r3
+

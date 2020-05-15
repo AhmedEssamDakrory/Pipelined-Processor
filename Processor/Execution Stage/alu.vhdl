@@ -65,7 +65,10 @@ begin
                 ResultSignal <= '0' & std_logic_vector(unsigned(A) sll to_integer(unsigned(B)));
                 when others => ResultSignal <= (others => '0');
             end case;
-
+         elsif (Operation(4)='1' and Operation(3)='0') then  -- Memory
+            case(Operation(2 downto 0)) is
+                when others => ResultSignal <= '0' & B ;
+            end case;
         end if;    
         ---------Update Flags--------------------------
         FlagsOutput(0)<=(not CheckZero(ResultSignal(N-1 downto 0)));
