@@ -7,9 +7,9 @@ class Assembler {
 	map<string, int> reg;
 	map<string, int> oneOp, twoOp, memOp, brOp;
 	const vector<string> oneOP_ = { "nop" , "not", "inc", "dec", "out", "in" };
-	const vector<string> twoOP_ = { "swap" , "add", "iadd", "sub", "and", "or", "shl", "shr"};
-	const vector<string> memOP_ = { "push" , "pop", "ldm", "ldd", "std"};
-	const vector<string> brOp_ = { "jz" , "jmp", "call", "ret", "rti"};
+	const vector<string> twoOP_ = { "swap" , "add", "iadd", "sub", "and", "or", "shl", "shr" };
+	const vector<string> memOP_ = { "push" , "pop", "ldm", "ldd", "std" };
+	const vector<string> brOp_ = { "jz" , "jmp", "call", "ret", "rti" };
 
 	int hex_int(string s) {
 		stringstream h(s);
@@ -17,7 +17,7 @@ class Assembler {
 		h >> std::hex >> imm;
 		return imm;
 	}
-	
+
 public:
 
 	Assembler() {
@@ -69,7 +69,7 @@ public:
 			mem.push_back(val);
 		}
 
-		while (getline(cin,s)) {
+		while (getline(cin, s)) {
 
 			if (s == "") continue;
 			//replce any comma with space
@@ -81,8 +81,11 @@ public:
 				transform(f.begin(), f.end(), f.begin(), ::tolower);
 				instr.push_back(f);
 			}
-			if (instr[0] == "nop") continue;
 			bitset<16> b;
+			if (instr[0] == "nop") {
+				mem.push_back(b);
+				continue;
+			}
 			if (oneOp.count(instr[0])) {
 				bitset<3> op(oneOp[instr[0]]);
 				b[13] = op[2], b[12] = op[1], b[11] = op[0];
@@ -95,7 +98,7 @@ public:
 				bitset<3> op(twoOp[instr[0]]);
 				b[13] = op[2], b[12] = op[1], b[11] = op[0];
 				if (instr[0] == "iadd") {
-					bitset<3> Rsrc1(reg[instr[2]]) , Rdst(reg[instr[1]]);
+					bitset<3> Rsrc1(reg[instr[2]]), Rdst(reg[instr[1]]);
 					b[10] = Rdst[2], b[9] = Rdst[1], b[8] = Rdst[0];
 					b[7] = Rsrc1[2], b[6] = Rsrc1[1], b[5] = Rsrc1[0];
 					b[1] = 1; // extend
@@ -131,7 +134,7 @@ public:
 				b[15] = 1;
 				bitset<3> op(memOp[instr[0]]);
 				b[13] = op[2], b[12] = op[1], b[11] = op[0];
-				if (instr[0] == "push" || instr[0] == "push") {
+				if (instr[0] == "push" || instr[0] == "pop") {
 					bitset<3> Rdst(reg[instr[1]]);
 					b[10] = b[7] = b[4] = Rdst[2], b[9] = b[6] = b[3] = Rdst[1], b[8] = b[5] = b[2] = Rdst[0]; // Rdst in Rsrc1 & Rsrc2...
 					mem.push_back(b);
@@ -146,7 +149,7 @@ public:
 				}
 				else {
 					bitset<3> Rdst(reg[instr[1]]);
-					b[10] = Rdst[2], b[9] = Rdst[1], b[8] = Rdst[0];
+					b[10] = b[4] = Rdst[2], b[9] = b[3] = Rdst[1], b[8] = b[2] = Rdst[0];
 					b[1] = 1; // extend
 					bitset<20> EA(hex_int(instr[2]));
 					b[7] = EA[19], b[6] = EA[18], b[5] = EA[17];
