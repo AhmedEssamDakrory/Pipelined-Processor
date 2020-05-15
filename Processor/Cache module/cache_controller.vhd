@@ -150,11 +150,12 @@ begin
 					end if;	
 				end if;
 			elsif current_state_data =  WRITE_TO_MEM then
-				stall_mem <= '1';
 				if ready = '1' then
+					stall_mem <= '0';
 					enable_ram_data <= '0' ;
 					next_state_data <= READ_FROM_MEM;
-				else 
+				else
+					stall_mem <= '1';
 					we_ram_data <= '1';
 					enable_ram_data <= '1' ;
 					mem_procsseor_data <= '0';
@@ -162,8 +163,8 @@ begin
 					data_in_mem <= data_in_cache_mem_data; 
 				end if;
 			elsif current_state_data = READ_FROM_MEM then
-				stall_mem <= '1';
 				if ready = '1' then
+					stall_mem <= '0';
 					enable_ram_data <= '0' ;
 					mem_procsseor_data <= '0';
 					data_control(to_integer(unsigned(index_data))) <= "10" & tag_data; -- not dirty any more & block is valid
@@ -171,9 +172,10 @@ begin
 					data_out_cache_mem_data <= data_out_mem;
 					next_state_data <= IDLE;
 				else 
+					stall_mem <= '1';
 					we_ram_data <= '0';
 					enable_ram_data <= '1' ;
-					out_address_data <= '1' & address_data(10 downto 2) & "00" ;  
+					out_address_data <= '1' & address_data(10 downto 3) & "000" ;  
 				end if;
 			end if;
 			else
@@ -231,14 +233,15 @@ begin
 					end if;	
 				end if;
 			elsif current_state_inst = WRITE_TO_MEM then
-				stall_inst <= '1';
 				if ready = '1' then
+					stall_inst <= '0';
 					enable_ram_inst <= '0' ;
 					next_state_inst <= READ_FROM_MEM;
 				else 
 					if(next_state_data /= IDLE)then
 						next_state_inst <= IDLE;
 					end if;
+					stall_inst <= '1';
 					we_ram_inst <= '1';
 					enable_ram_inst <= '1' ;
 					mem_procsseor_inst <= '0';
@@ -246,8 +249,8 @@ begin
 					inst_in_mem <= data_in_cache_mem_inst; 
 				end if;
 			elsif current_state_inst = READ_FROM_MEM then
-				stall_inst <= '1';
 				if ready = '1' then
+					stall_inst <= '0';
 					enable_ram_inst <= '0' ;
 					mem_procsseor_inst <= '0';
 					inst_control(to_integer(unsigned(index_inst))) <= "10" & tag_inst; -- not dirty any more & block is valid
@@ -258,6 +261,7 @@ begin
 					if(next_state_data /= IDLE)then
 						next_state_inst <= IDLE;
 					end if;
+					stall_inst <= '1';
 					we_ram_inst <= '0';
 					enable_ram_inst <= '1' ;
 					out_address_inst <= '0' & address_inst(10 downto 3) & "000";  
