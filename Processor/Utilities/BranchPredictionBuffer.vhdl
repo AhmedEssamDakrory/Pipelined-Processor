@@ -39,7 +39,7 @@ begin
               else
                  temp<=PredictionBuffer(to_integer("000"&UNSIGNED(BranchPc)));
                  fsm_input<=to_Integer(UNSIGNED(temp(14 downto 13)));
-                 PredictionBuffer(to_integer("000"&UNSIGNED(BranchPc)))<=input&std_logic_vector(to_unsigned(fsm_output,2))&BranchPc;
+                 PredictionBuffer(to_integer("000"&UNSIGNED(BranchPc)))<=fsm_signal_output&std_logic_vector(to_unsigned(fsm_output,2))&BranchPc;
                  output<=PredictionBuffer(to_integer("000"&UNSIGNED(BranchPc)))(15);
               end if;
             else
