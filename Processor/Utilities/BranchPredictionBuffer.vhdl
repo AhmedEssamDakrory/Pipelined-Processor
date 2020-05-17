@@ -6,7 +6,7 @@ use IEEE.Numeric_Std.all;
 entity BranchPredictionBuffer is
   port (
     clk	    	  : in  std_logic;
-    Instruction : in  std_logic_vector(15 downto 0);
+    Instruction : in  std_logic_vector(4 downto 0);
     BranchPc    : in std_logic_vector(12 downto 0);
     input       : in  std_logic;	-- Taken = 1 , Not Taken = 0
     we,rst      : in std_logic; -- write 1 , read 0
@@ -31,7 +31,7 @@ begin
         PredictionBuffer<=(others=>X"0000");
     else
         if rising_edge(clk) then
-          if (Instruction(15) and Instruction(14))='1' --Memory Instruction
+          if (Instruction(4) and Instruction(3))='1' Then --Branch Instruction
             if we ='1' then
               if  PredictionBuffer(to_integer("000"&UNSIGNED(BranchPc)))=x"0000" and input='0' then
                   PredictionBuffer(to_integer("000"&UNSIGNED(BranchPc)))<="101"&BranchPc;
@@ -45,6 +45,8 @@ begin
             else
               output<= PredictionBuffer(to_integer("000"&UNSIGNED(BranchPc)))(15);
             end if;
+          else
+            output<='0';
           end if;
         end if;
     end if;

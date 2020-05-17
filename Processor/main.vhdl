@@ -79,7 +79,10 @@ architecture MainArchitecture of Main is
     Signal wb_mux_output           :std_logic_vector(31 downto 0);
     Signal concatenate_mux_signal_input,extend_mux_signal,sign_imm  :std_logic_vector(4 downto 0);
     Signal concatenate_mux_signal_output  :std_logic_vector(20 downto 0);
-	Signal Last_Mux_Sel : std_logic;
+    Signal Last_Mux_Sel : std_logic;
+    
+    -- Branch Prediction Signal
+    Signal branch_prediction_output :std_logic;
     
 
 
@@ -89,11 +92,11 @@ begin
     Read_Sig_out_alu,'1',cache_stall_mem,cache_stall_fetch,to_mem,(others=>'0'),data_out_mem_stage,data_out_inst_stage);
     --Fetch Stage
     Fetch_Stage :entity work.fetch_stage(structural) port map(clk,rst,load_hazard_stall,fetch_hazard_flush,int_ret_flush,cache_stall_mem,cache_stall_fetch
-    ,taken_sel,wrong_pred_sel,PcWrBack_out,Rdest_sel,data_out_mem_stage,Result,Rdst,BrnchTakenOutput,DataFromMem_out,data2_out_decode,Rsrc2_out_alu,pc);
+    ,branch_prediction_output,wrong_pred_sel,PcWrBack_out,Rdest_sel,data_out_mem_stage,Result,Rdst,BrnchTakenOutput,DataFromMem_out,data2_out_decode,Rsrc2_out_alu,pc);
     --Disable Signal
     Nand_output<= data_out_inst_stage(1) and (not(Disable_extend));
     flipflop :entity work.FlipFlop(arch) port map('1',rst,clk,Nand_output,Disable_extend);
-    --Fetch buffer----change 0 after fix branch prediction
+    --Fetch buffer----
     rst_fetch_buffer<=(rst or flush_fetch_buffer);
     Fetch_Buffer :entity work.Fetch_Buffer(arch_fetch_buffer) port map(clk,load_fetch_buffer,rst_fetch_buffer,data_out_inst_stage,pc,Disable_extend,
     '0',instr_out,pc_out,disableForImmediate_out,takenSigForBranch_out);
@@ -117,6 +120,10 @@ begin
             flush_fetch_buffer<='0';
         end if;
     end process;
+
+    --Branch Prediction
+    Branch_Prediction_Unit :entity work.BranchPredictionBuffer(ArchOfBranchPredictionBuffer) port map(clk,data_out_inst_stage(15 downto 11),
+    pc(12 downto 0),prediction_out,'1',rst,branch_prediction_output);
     --Decode Stage
     Decode_Unit :entity work.DecodeStage(arch) port map(clk,rst,instr_out(15 downto 14),instr_out(13 downto 11),int,load_fetch_buffer,disableForImmediate_out,
     instr_out(7 downto 5),instr_out(4 downto 2),DstAddress_out,Src1Address_out,instr_out(10 downto 8),WbSig_out,SwapSig_out,wb_mux_output,Rsrc2_out,
