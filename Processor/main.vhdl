@@ -14,7 +14,7 @@ architecture MainArchitecture of Main is
 
     signal load_hazard_stall,fetch_hazard_flush,int_ret_flush,cache_stall_mem,cache_stall_fetch,taken_sel,wrong_pred_sel,write_back_sel :std_logic;
     signal Rdest_sel 	:	std_logic_vector(2 downto 0);
-    Signal pc	: 	std_logic_vector(31 downto 0);
+    Signal pc			: 	std_logic_vector(31 downto 0);
 
     --Memory buffer signals
     Signal PcWrBack_out,WbSig_out,MemToRegSig_out,OutPortSig_out,SwapSig_out    :std_logic;
@@ -92,7 +92,7 @@ begin
     Read_Sig_out_alu,'1',cache_stall_mem,cache_stall_fetch,to_mem,(others=>'0'),data_out_mem_stage,data_out_inst_stage);
     --Fetch Stage
     Fetch_Stage :entity work.fetch_stage(structural) port map(clk,rst,load_hazard_stall,fetch_hazard_flush,int_ret_flush,cache_stall_mem,cache_stall_fetch
-    ,branch_prediction_output,wrong_pred_sel,PcWrBack_out,Rdest_sel,data_out_mem_stage,Result,Rdst,BrnchTakenOutput,DataFromMem_out,data2_out_decode,Rsrc2_out_alu,pc);
+    ,branch_prediction_output,wrong_pred_sel,PcWrBack_out,Rdest_sel,data_out_mem_stage,Result,Rdst,BrnchTakenOutput,DataFromMem_out,data2_out_decode,Rsrc2_out_alu,data_out_inst_stage,pc);
     --Disable Signal
     Nand_output<= data_out_inst_stage(1) and (not(Disable_extend));
     flipflop :entity work.FlipFlop(arch) port map('1',rst,clk,Nand_output,Disable_extend);

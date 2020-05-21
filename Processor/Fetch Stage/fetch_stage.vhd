@@ -10,8 +10,8 @@ port(
 	taken_sel,wrong_pred_sel,write_back_sel												: in	std_logic;
 	Rdest_sel																			: in	std_logic_vector(2 downto 0);
 	Rdest_mem,Rdest_alu,Rdest_decode,R_alternative,R_writeback,Src1_Alu,Src1_mem		: in 	std_logic_vector(31 downto 0);
+	inst																				: in 	std_logic_vector(15 downto 0);
 	pc																					: out	std_logic_vector(31 downto 0)	
-	
   );
 end fetch_stage;
 
@@ -28,11 +28,11 @@ architecture structural of fetch_stage is
 		);
 	end component;
 	
-	signal R1,R2,R3,R4,pc_inc,temp_pc						:	std_logic_vector(31 downto 0);
-	signal enable											:	std_logic;
+	signal R1,R2,R3,R4,R5,pc_inc,temp_pc						:	std_logic_vector(31 downto 0);
+	signal enable,flag											:	std_logic;
 	
 begin
-	pc_reg	:	reg port map(enable, rst, clk, R4, temp_pc);
+	pc_reg	:	reg port map(enable, rst, clk, R5, temp_pc);
 
 	pc <= temp_pc;
 	
@@ -50,8 +50,21 @@ begin
 			
 	R4 <= R3 when write_back_sel = '0' else
 				R_writeback	;
-				
+	
+	R5 <= "0000000000000000"&inst when flag = '1' else
+				R4;
 	enable <= not (disable1 or disable2 or disable3 or disable4 or disable5);
 	pc_inc <= std_logic_vector( unsigned(temp_pc) + 1 );
-
+	
+	
+	process(clk)
+	begin
+		if(rising_Edge(clk)) then
+			if( rst = '1')then
+				flag <= '1';
+			elsif( enable = '1')then
+				flag <= '0';
+			end if;
+		end if;
+	end process;
 end structural;
