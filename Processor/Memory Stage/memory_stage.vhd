@@ -6,7 +6,7 @@ entity memory_stage is
 port(
 	flags_src, swap								: in	std_logic;
 	to_mem, data								: out	std_logic_vector(31 downto 0);
-	Rsrc2_in,from_mem							: in	std_logic_vector(31 downto 0);
+	Rsrc2_in,alu_result,from_mem							: in	std_logic_vector(31 downto 0);
 	flags										: in	std_logic_vector(2 downto 0)
   );
 end memory_stage;
@@ -20,6 +20,6 @@ begin
 				"00000000000000000000000000000"& flags;
 	 
 	data <= from_mem when swap = '0' else
-				Rsrc2_in;
+				alu_result;
 				
 end structural;

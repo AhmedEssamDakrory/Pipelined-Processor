@@ -39,10 +39,10 @@ begin
                 ResultSignal <= '0' & std_logic_vector(signed(A)+1);
                 when "011" => --DEC
                 ResultSignal <= '0' & std_logic_vector(signed(A)-1);
-                when "100" => --IN & Nob A
+                when "101" => --IN & Nob A
                 ResultSignal <= '0' & A ;
-                when "101" => --Nop B
-                ResultSignal <= '0' & B ;
+                when "100" => --Nop A
+                ResultSignal <= '0' & A ;
                 when others => ResultSignal <= (others => '0'); 
             end case;
         elsif (Operation(4)='0' and Operation(3)='1') then  -- Two Operand
@@ -68,8 +68,12 @@ begin
          elsif (Operation(4)='1' and Operation(3)='0') then  -- Memory
             case(Operation(2 downto 0)) is
 				when "000" => ResultSignal <= '0' & A;
+				when "001" => ResultSignal <= '0' & A;
                 when others => ResultSignal <= '0' & B ;
             end case;
+		else
+			ResultSignal <= '0' & A;
+		
         end if;    
         ---------Update Flags--------------------------
         FlagsOutput(0)<=(not CheckZero(ResultSignal(N-1 downto 0)));

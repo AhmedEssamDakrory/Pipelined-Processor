@@ -9,6 +9,7 @@ ENTITY DecodeStage IS
 	op_code				: IN STD_LOGIC_VECTOR(2 downto 0);
 	int					: IN STD_LOGIC;
 	stall_sp            : IN STD_LOGIC;
+	out_port_write      : in std_logic;
 	
 	disable				: IN STD_LOGIC;
 	address1			: IN STD_LOGIC_VECTOR(2 downto 0);
@@ -61,6 +62,18 @@ ARCHITECTURE arch OF DecodeStage IS
 		q   		: OUT STD_LOGIC_VECTOR(N-1 DOWNTO 0) 
 	);
 	END COMPONENT;
+	
+	COMPONENT Reg_SP IS
+	GENERIC (N : Integer := 32);
+	PORT(
+		load  		: IN STD_LOGIC;
+		clr 		: IN STD_LOGIC;
+		clk 		: IN STD_LOGIC;
+		d   		: IN STD_LOGIC_VECTOR(N-1 DOWNTO 0);
+		q   		: OUT STD_LOGIC_VECTOR(N-1 DOWNTO 0) 
+	);
+	END COMPONENT;
+	
 	COMPONENT ControlUnit IS
 	PORT(
 		clk 				: IN STD_LOGIC;
@@ -154,12 +167,12 @@ BEGIN
 	register_file	: RegisterFile port map (not_clk, clr, address1, address2, write_address1, write_address2,	dest, 
 											write_reg1, write_reg2, write_data1, write_data2, data1_sig, data2_sig, Rdst);
 	
-	stack_pointer 	: Reg port map(SP_load, clr, not_clk, SP_in, SP_curr);
+	stack_pointer 	: Reg_SP port map(SP_load, clr, clk, SP_in, SP_curr);
 	input_port 		: Reg port map(in_load, clr, not_clk, port_in, in_port_out);
-	output_port 	: Reg port map(out_port_sig, clr, not_clk, write_data1, out_port_out);
+	output_port 	: Reg port map(out_port_write, clr, not_clk, write_data1, port_out);
 	
-	SP_incremented <= std_logic_vector(unsigned(SP_in) + unsigned(one));
-	pass_inc_sp		: Mux2 port map(SP_incremented,SP_in, push_pop_sig, SP_out);
+	--SP_incremented <= std_logic_vector(unsigned(SP_in) + unsigned(two));
+	pass_inc_sp		: Mux2 port map(SP_in, SP_curr, push_pop_sig, SP_out);
 	
 	PC_incremented <= std_logic_vector(unsigned(PC) + unsigned(one));
 	pass_inc_pc		: Mux2 port map(PC, PC_incremented, pc_inc_sig, PC_out);
@@ -195,19 +208,9 @@ BEGIN
 	BEGIN
 		if(sp_load = '1') then
 			 if (sub_sig = '1') then
-				if(op_code = "000" and instr_type = "10")then
-					SP_in <= std_logic_vector(unsigned(SP_curr) + unsigned(std_logic_vector(unsigned(not(one)) + 1)));
-				else
 					SP_in <= std_logic_vector(unsigned(SP_curr) + unsigned(std_logic_vector(unsigned(not(two)) + 1)));
-				end if;
-			elsif clr='1' then 
-				SP_in <= "11111111111111111111111111111111";
 			else
-				if(op_code = "001" and instr_type = "10")then
-					SP_in <= std_logic_vector(unsigned(SP_curr) + unsigned(one));
-				else
 					SP_in <= std_logic_vector(unsigned(SP_curr) + unsigned(two));
-				end if;
 			end if;     
 		end if;
 		
