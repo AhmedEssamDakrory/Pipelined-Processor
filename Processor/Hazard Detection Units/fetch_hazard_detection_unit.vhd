@@ -24,7 +24,7 @@ end Fetch_Hazard_Detection_Unit;
 architecture fetch_hazard_arch of Fetch_Hazard_Detection_Unit is
 begin
 
-flush <= '0' when (typeOfInstr /= "11" and ( opCode /= "001"  or opCode /= "000")) else 
+flush <= '0' when not (typeOfInstr = "11" and ( opCode = "001"  or opCode = "000")) else 
 		 '1' when ( (dst_branch = dst_dec and wb_dec = '1') or 
 				  (dst_branch = src1_dec and swap_dec = '1') or 
 				  (dst_branch = dst_alu and wb_alu = '1') or 
