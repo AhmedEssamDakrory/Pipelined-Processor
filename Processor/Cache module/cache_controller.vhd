@@ -47,7 +47,7 @@ architecture fsm of cache_controller is
 	end component;
 
 	type cache_control_inst is array (0 to 31) of std_logic_vector(4 Downto 0);
-	type cache_control_data is array (0 to 31) of std_logic_vector(5 Downto 0);
+	type cache_control_data is array (0 to 31) of std_logic_vector(4 Downto 0);
 	type state_type is (IDLE , WRITE_TO_MEM , READ_FROM_MEM );
 
 	signal data_control 																: cache_control_data	:= ((others=> (others=>'0'))); -- valid  dirty  tag
@@ -70,7 +70,7 @@ architecture fsm of cache_controller is
 begin	
 	
 	
-	data_cache: cache generic map(32) port map(clk, we_cache_data, mem_procsseor_data, address_data(6 downto 2), address_data(1 downto 0), data_out_cache_data, data_in_cache_data, data_out_cache_mem_data, data_in_cache_mem_data );
+	data_cache: cache generic map(32) port map(clk, we_cache_data, mem_procsseor_data, address_data(7 downto 3), address_data(2 downto 1), data_out_cache_data, data_in_cache_data, data_out_cache_mem_data, data_in_cache_mem_data );
 	inst_cache: cache generic map(16) port map(clk, we_cache_inst, mem_procsseor_inst, address_inst(7 downto 3), address_inst(2 downto 0), data_out_cache_inst, data_in_cache_inst, data_out_cache_mem_inst, data_in_cache_mem_inst );
 	memory	  : sync_ram	port map(clk, we_ram, enable_ram, ready, out_address, in_mem, data_out_mem);
 	
@@ -106,35 +106,35 @@ begin
 
 -- Combinational circuit to estimate next state for data controller ----	
 	process(rst, write_data , address_data , read_data ,data_in_cache_data, current_state_data, ready, data_in_mem_stage, data_in_cache_mem_data, data_out_mem) 
-	variable tag_data		:	std_logic_vector(3 downto 0);
+	variable tag_data		:	std_logic_vector(2 downto 0);
 	variable offset_data	:	std_logic_vector(1 downto 0);
 	variable index_data				:	std_logic_vector(4 downto 0);
 	begin
 		if rst = '0' then		-- if processor is working
-			tag_data := address_data(10 downto 7);
-			index_data := address_data(6 downto 2);			-- parse index and offset and tag
-			offset_data := address_data(1 downto 0);
+			tag_data := address_data(10 downto 8);
+			index_data := address_data(7 downto 3);			-- parse index and offset and tag
+			offset_data := address_data(2 downto 1);
 			if( current_state_data = IDLE) then
 				if(write_data = '1')then
-					if( data_control(to_integer(unsigned(index_data)))(3 downto 0)  =  tag_data    
-														and  data_control(to_integer(unsigned(index_data)))(5) = '1')then	-- my tag and data is valid
+					if( data_control(to_integer(unsigned(index_data)))(2 downto 0)  =  tag_data    
+														and  data_control(to_integer(unsigned(index_data)))(4) = '1')then	-- my tag and data is valid
 						stall_mem <= '0';
 						we_cache_data <= '1';
 						mem_procsseor_data <= '1';
 						data_out_cache_data	<= data_in_mem_stage;
-						data_control(to_integer(unsigned(index_data)))(4) <= '1';
+						data_control(to_integer(unsigned(index_data)))(3) <= '1';
 					else 		
 						stall_mem <= '1';
 						we_cache_data <= '0';
-						if data_control(to_integer(unsigned(index_data)))(4) = '1' then	-- current data is dirty
+						if data_control(to_integer(unsigned(index_data)))(3) = '1' then	-- current data is dirty
 							next_state_data <= WRITE_TO_MEM; 
 						else 
 							next_state_data <= READ_FROM_MEM;
 						end if;
 					end if;
 				elsif( read_data = '1')then
-					if( data_control(to_integer(unsigned(index_data)))(3 downto 0)  =  tag_data    
-														and  data_control(to_integer(unsigned(index_data)))(5) = '1')then	-- my tag and data is valid
+					if( data_control(to_integer(unsigned(index_data)))(2 downto 0)  =  tag_data    
+														and  data_control(to_integer(unsigned(index_data)))(4) = '1')then	-- my tag and data is valid
 						stall_mem <= '0';
 						we_cache_data <= '0';
 						mem_procsseor_data <= '1';
@@ -142,7 +142,7 @@ begin
 						next_state_data <= IDLE;
 					else 		
 						stall_mem <= '1';
-						if data_control(to_integer(unsigned(index_data)))(4) = '1' then	-- current data is dirty
+						if data_control(to_integer(unsigned(index_data)))(3) = '1' then	-- current data is dirty
 							next_state_data <= WRITE_TO_MEM; 
 						else 
 							next_state_data <= READ_FROM_MEM;
@@ -158,7 +158,7 @@ begin
 					we_ram_data <= '1';
 					enable_ram_data <= '1' ;
 					mem_procsseor_data <= '0';
-					out_address_data <= '1' & data_control(to_integer(unsigned(index_data)))(3 downto 0) & index_data & "00" ;			
+					out_address_data <= '1' & data_control(to_integer(unsigned(index_data)))(2 downto 0) & index_data & "000" ;			
 					data_in_mem <= data_in_cache_mem_data; 
 				end if;
 			elsif current_state_data = READ_FROM_MEM then
