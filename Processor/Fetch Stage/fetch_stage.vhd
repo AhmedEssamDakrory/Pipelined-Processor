@@ -29,8 +29,7 @@ architecture structural of fetch_stage is
 	end component;
 	
 	signal R1,R2,R3,R4,R5,pc_inc,temp_pc						:	std_logic_vector(31 downto 0);
-	signal enable,flag											:	std_logic;
-	
+	signal enable,flag,not_clock											:	std_logic;
 begin
 	pc_reg	:	reg port map(enable, rst, clk, R5, temp_pc);
 

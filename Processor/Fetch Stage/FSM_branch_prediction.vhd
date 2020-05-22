@@ -6,7 +6,6 @@ use ieee.std_logic_textio.all;
 
 Entity FSM is
 	port(input,clk,rst,we:in  std_logic; --to start from given state
-		BranchAddress :in std_logic_vector(12 downto 0);
 		inputState : in integer range 0 to 3;
 		outputState : out integer range 0 to 3;
 		output : out std_logic);
