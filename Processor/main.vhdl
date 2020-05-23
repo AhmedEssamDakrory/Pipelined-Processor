@@ -139,13 +139,13 @@ begin
     unCondSig_out_decode,flagsOrSrc_out_decode,typeOfInstr_out_decode,opcode_out_decode,Src1Address_out_decode,Src2Address_out_decode,DstAddress_out_decode,
     EA_4_bits_out_decode,data1_out_decode,data2_out_decode);
 
-    process(cache_stall_mem,wrong_pred_sel,disableForImmediate_out,cache_stall_fetch)
+    process(cache_stall_mem,wrong_pred_sel,disableForImmediate_out,cache_stall_fetch,load_hazard_stall)
     begin
             --Flush  and stall signals
-        if cache_stall_mem='1'  or cache_stall_fetch ='1' then
+        if cache_stall_mem='1'  or cache_stall_fetch = '1' then
             decode_stall<='0';
             decode_flush<='0';
-        elsif wrong_pred_sel='1' then
+        elsif wrong_pred_sel='1' or load_hazard_stall = '1' then
             decode_stall<='1';
             decode_flush<='1';
         elsif disableForImmediate_out='1' then
