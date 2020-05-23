@@ -26,15 +26,17 @@ architecture RTL of cache is
    
 begin
 
-  process(index , offset , datain_mem , datain_processor , we) is
+  process(clock) is
 
   begin
+	if(falling_edge(clock))then
       if we = '1' then
         if( mem_procsseor = '1')then
 			cache_mem(to_integer(unsigned(index))) (to_integer(unsigned(offset))*N + N - 1 Downto  to_integer(unsigned(offset)) * N) <= datain_processor;
 		else
 			cache_mem(to_integer(unsigned(index))) <= datain_mem;
 		end if;
+	  end if;
 	  end if;
   end process;
 
