@@ -148,6 +148,8 @@ begin
 							next_state_data <= READ_FROM_MEM;
 						end if;
 					end if;	
+				else
+					we_cache_data <= '0';
 				end if;
 			elsif current_state_data =  WRITE_TO_MEM then
 				stall_mem <= '1';
