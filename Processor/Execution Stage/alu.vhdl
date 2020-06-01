@@ -78,13 +78,15 @@ begin
 		
         end if;    
         ---------Update Flags--------------------------
-        FlagsOutput(0)<=(not CheckZero(ResultSignal(N-1 downto 0)));
-        if(ResultSignal(N-1)='1')then
-            FlagsOutput(1)<='1';
-        else
-            FlagsOutput(1)<='0';
-        end if;
-        FlagsOutput(2)<=ResultSignal(N);
-        Result<=ResultSignal(N-1 downto 0);   
+		if(not(Operation(4)='0' and Operation(3)='0' and Operation(2)='1' and Operation(1)='0' and Operation(0)='1' )) then
+			FlagsOutput(0)<=(not CheckZero(ResultSignal(N-1 downto 0)));
+			if(ResultSignal(N-1)='1')then
+				FlagsOutput(1)<='1';
+			else
+				FlagsOutput(1)<='0';
+			end if;
+			FlagsOutput(2)<=ResultSignal(N);
+		end if;
+		Result<=ResultSignal(N-1 downto 0);
     end process;
 end ALU_arcitecture;
