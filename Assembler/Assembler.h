@@ -18,6 +18,17 @@ class Assembler {
 		return imm;
 	}
 
+	bool checkValidNumber(string s) {
+		bool valid = true;
+		for (auto x : s) {
+			if (!(x >= '0' && x <= '9')) {
+				valid = false;
+				break;
+			}
+		}
+		return valid;
+	}
+
 public:
 
 	Assembler() {
@@ -47,7 +58,7 @@ public:
 	void encode(string file_name) {
 		ifstream cin(file_name);
 		string s;
-
+		/*
 		int cntOrg = 0;
 		while (1) {
 			getline(cin, s);
@@ -68,20 +79,38 @@ public:
 			bitset<16> val(hex_int(s));
 			mem.push_back(val);
 		}
+		*/
 
 		while (getline(cin, s)) {
-
-			if (s == "") continue;
 			//replce any comma with space
 			for (int i = 0; i < (int)s.size(); ++i) s[i] = s[i] == ',' ? ' ' : s[i];
 			stringstream ss(s);
 			vector<string> instr;
 			string f;
 			while (ss >> f) {
+				if (f[0] == '#') break;
 				transform(f.begin(), f.end(), f.begin(), ::tolower);
 				instr.push_back(f);
 			}
+			if (int(instr.size()) == 0) {
+				continue;
+			}
 			bitset<16> b;
+			if (checkValidNumber(instr[0])) {
+				int val = hex_int(instr[0]);
+				bitset<16> bb(val);
+				mem.push_back(val);
+				continue;
+			}
+
+			if (instr[0] == ".org") {
+				int address = hex_int(instr[1]);
+				while ((int)mem.size() < address) {
+					mem.push_back(b);
+				}
+				continue;
+			}
+
 			if (instr[0] == "nop") {
 				mem.push_back(b);
 				continue;
@@ -98,7 +127,7 @@ public:
 				bitset<3> op(twoOp[instr[0]]);
 				b[13] = op[2], b[12] = op[1], b[11] = op[0];
 				if (instr[0] == "iadd") {
-					bitset<3> Rsrc1(reg[instr[2]]), Rdst(reg[instr[1]]);
+					bitset<3> Rsrc1(reg[instr[1]]), Rdst(reg[instr[2]]);
 					b[10] = Rdst[2], b[9] = Rdst[1], b[8] = Rdst[0];
 					b[7] = Rsrc1[2], b[6] = Rsrc1[1], b[5] = Rsrc1[0];
 					b[1] = 1; // extend
@@ -108,7 +137,7 @@ public:
 
 				}
 				else if (instr[0] != "swap" && instr[0] != "shr" && instr[0] != "shl") {
-					bitset<3> Rsrc1(reg[instr[2]]), Rsrc2(reg[instr[3]]), Rdst(reg[instr[1]]);
+					bitset<3> Rsrc1(reg[instr[1]]), Rsrc2(reg[instr[2]]), Rdst(reg[instr[3]]);
 					b[10] = Rdst[2], b[9] = Rdst[1], b[8] = Rdst[0];
 					b[7] = Rsrc1[2], b[6] = Rsrc1[1], b[5] = Rsrc1[0];
 					b[4] = Rsrc2[2], b[3] = Rsrc2[1], b[2] = Rsrc2[0];
@@ -123,7 +152,7 @@ public:
 					mem.push_back(imm);
 				}
 				else {
-					bitset<3> Rsrc1(reg[instr[2]]), Rsrc2(reg[instr[1]]), Rdst(reg[instr[1]]);
+					bitset<3> Rsrc1(reg[instr[1]]), Rsrc2(reg[instr[2]]), Rdst(reg[instr[2]]);
 					b[10] = Rdst[2], b[9] = Rdst[1], b[8] = Rdst[0];
 					b[7] = Rsrc1[2], b[6] = Rsrc1[1], b[5] = Rsrc1[0];
 					b[4] = Rsrc2[2], b[3] = Rsrc2[1], b[2] = Rsrc2[0];
