@@ -92,7 +92,7 @@ begin
     Read_Sig_out_alu,'1',cache_stall_mem,cache_stall_fetch,to_mem,(others=>'0'),data_out_mem_stage,data_out_inst_stage);
     --Fetch Stage
     Fetch_Stage :entity work.fetch_stage(structural) port map(clk,rst,load_hazard_stall,fetch_hazard_flush,int_ret_flush,cache_stall_mem,cache_stall_fetch
-    ,branch_prediction_output,wrong_pred_sel,PcWrBack_out,Rdest_sel,data_out_mem_stage,Result,Rdst,BrnchTakenOutput,DataFromMem_out,data2_out_decode,Rsrc2_out_alu,data_out_inst_stage,pc);
+    ,'0',wrong_pred_sel,PcWrBack_out,Rdest_sel,data_out_mem_stage,Result,Rdst,BrnchTakenOutput,DataFromMem_out,data2_out_decode,Rsrc2_out_alu,data_out_inst_stage,pc);
     --Disable Signal
     Nand_output<= data_out_inst_stage(1) and (not(Disable_extend));
     flipflop :entity work.FlipFlop(arch) port map('1',rst,clk,Nand_output,Disable_extend);
@@ -100,13 +100,13 @@ begin
     rst_fetch_buffer<=(rst or flush_fetch_buffer);
     Fetch_Buffer :entity work.Fetch_Buffer(arch_fetch_buffer) port map(clk,load_fetch_buffer,rst_fetch_buffer,data_out_inst_stage,pc,Disable_extend,
     '0',instr_out,pc_out,disableForImmediate_out,takenSigForBranch_out);
-    process(cache_stall_mem,int_ret_flush,load_hazard_stall,cache_stall_fetch,fetch_hazard_flush)
+    process(cache_stall_mem,int_ret_flush,load_hazard_stall,cache_stall_fetch,fetch_hazard_flush,wrong_pred_sel)
     begin
             --Flush  and stall signals
-        if cache_stall_mem='1'  or cache_stall_fetch ='1' then
+        if cache_stall_mem = '1'  or cache_stall_fetch = '1' then
             load_fetch_buffer<='0';
             flush_fetch_buffer<='0';
-        elsif int_ret_flush ='1' then
+        elsif int_ret_flush ='1' or wrong_pred_sel = '1' then
             load_fetch_buffer<='1';
             flush_fetch_buffer<='1';
         elsif load_hazard_stall='1'  then
