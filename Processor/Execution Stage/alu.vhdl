@@ -10,6 +10,7 @@ entity ALU is
         Operation:in std_logic_vector(4 downto 0);
         FlagsOutput: out std_logic_vector(3 downto 0);
         A,B :in std_logic_vector(N-1 downto 0);
+		int: in std_logic;
         Result:out std_logic_vector(N-1 downto 0)
     );
 end ALU;
@@ -28,8 +29,9 @@ architecture ALU_arcitecture of ALU is
 begin
     process(A,B,Operation,ResultSignal)
     begin
-        --Check Type
-        if (Operation(4)='0' and Operation(3)='0' )then  -- One Operand
+		if(int = '1') then
+			ResultSignal <= '0' & A ; 
+        elsif (Operation(4)='0' and Operation(3)='0' )then  -- One Operand
             case(Operation(2 downto 0)) is
                 when "000" => -- Nop
                 ResultSignal <= (others => '0');

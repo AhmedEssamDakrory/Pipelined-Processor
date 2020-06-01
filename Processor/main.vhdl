@@ -50,12 +50,12 @@ architecture MainArchitecture of Main is
     --Decode stage Siganls
     Signal data1,data2,Rdst : STD_LOGIC_VECTOR(31 downto 0);		
     Signal sub,ea_immediate	,mem_read,mem_write,push_pop,jz,jmp,flags,flags_write_back,pc_inc,pc_write_back,src1,src2,select_in,		
-           swap,mem_to_reg,write_back,out_port,enable : std_logic;
+           swap,mem_to_reg,write_back,out_port,enable,int_out_decode : std_logic;
 
     -- Decode Buffer Signal
     Signal PcWrBack_out_decode,Read_Sig_out_decode,Write_Sig_out_decode,WbSig_out_decode,MemToRegSig_out_decode,OutPortSig_out_decode,
     SwapSig_out_decode,ExtendSig_out_decode,EAOrImmSig_out_decode,JzSig_out_decode,TakenSigForBranch_out_decode,ALU_WrFlagSig_out_decode,
-    unCondSig_out_decode,flagsOrSrc_out_decode : std_logic;
+    unCondSig_out_decode,flagsOrSrc_out_decode,int_out_decode_buffer  : std_logic;
 
 	  signal pc_exec_out_decode                 : std_logic_vector(9 downto 0);
     Signal typeOfInstr_out_decode             : std_logic_vector (1 downto 0);
@@ -92,15 +92,15 @@ begin
     Cache_Controller :entity work.cache_controller(fsm) port map(clk,rst, AluResult_out_alu(10 downto 0) ,pc(10 downto 0),Write_Sig_out_alu,'0',
     Read_Sig_out_alu,'1',cache_stall_mem,cache_stall_fetch,to_mem,(others=>'0'),data_out_mem_stage,data_out_inst_stage);
     --Fetch Stage
-    Fetch_Stage :entity work.fetch_stage(structural) port map(clk,rst,load_hazard_stall,fetch_hazard_flush,int_ret_flush,cache_stall_mem,cache_stall_fetch
-    ,branch_prediction_output,wrong_pred_sel,PcWrBack_out,Rdest_sel,data_out_mem_stage,Result,Rdst,BrnchTakenOutput,DataFromMem_out,data2_out_decode,Rsrc2_out_alu,data_out_inst_stage,pc);
+    Fetch_Stage :entity work.fetch_stage(structural) port map(clk,rst,int,load_hazard_stall,fetch_hazard_flush,int_ret_flush,cache_stall_mem,cache_stall_fetch
+    ,'0',wrong_pred_sel,PcWrBack_out,Rdest_sel,data_out_mem_stage,Result,Rdst,BrnchTakenOutput,DataFromMem_out,data2_out_decode,Rsrc2_out_alu,data_out_inst_stage,pc);
     --Disable Signal
     Nand_output<= data_out_inst_stage(1) and (not(Disable_extend));
     flipflop :entity work.FlipFlop(arch) port map('1',rst,clk,Nand_output,Disable_extend);
     --Fetch buffer----
     rst_fetch_buffer<=(rst or flush_fetch_buffer);
     Fetch_Buffer :entity work.Fetch_Buffer(arch_fetch_buffer) port map(clk,load_fetch_buffer,rst_fetch_buffer,data_out_inst_stage,pc,Disable_extend,
-    branch_prediction_output,instr_out,pc_out,disableForImmediate_out,takenSigForBranch_out);
+    '0',instr_out,pc_out,disableForImmediate_out,takenSigForBranch_out);
     process(cache_stall_mem,int_ret_flush,load_hazard_stall,cache_stall_fetch,fetch_hazard_flush,wrong_pred_sel)
     begin
             --Flush  and stall signals
@@ -123,22 +123,22 @@ begin
     end process;
 
     --Branch Prediction
-    Branch_Prediction_Unit :entity work.BranchPredictionBuffer(ArchOfBranchPredictionBuffer) port map(clk,data_out_inst_stage(15 downto 11),
-    pc(9 downto 0), taken_in_branch_prediction,'1',rst,branch_prediction_output);
+    --Branch_Prediction_Unit :entity work.BranchPredictionBuffer(ArchOfBranchPredictionBuffer) port map('0',data_out_inst_stage(15 downto 11),
+    --pc(9 downto 0), taken_in_branch_prediction,'1',rst,branch_prediction_output);
     --Decode Stage
     Decode_Unit :entity work.DecodeStage(arch) port map(clk,rst,instr_out(15 downto 14),instr_out(13 downto 11),int,load_fetch_buffer, OutPortSig_out,disableForImmediate_out,
     instr_out(7 downto 5),instr_out(4 downto 2),DstAddress_out,Src1Address_out,data_out_inst_stage(10 downto 8),WbSig_out,SwapSig_out,wb_mux_output,Rsrc2_out,
-    pc_out,port_in,data1,data2,Rdst,port_out,sub,ea_immediate,mem_read,mem_write,push_pop,jz,jmp,flags,flags_write_back,pc_inc,pc_write_back,int_ret_flush,src1,src2,select_in,	
-    swap,mem_to_reg,write_back,out_port,enable);
+    pc,port_in,data1,data2,Rdst,port_out,sub,ea_immediate,mem_read,mem_write,push_pop,jz,jmp,flags,flags_write_back,pc_inc,pc_write_back,int_ret_flush,src1,src2,select_in,	
+    swap,mem_to_reg,write_back,out_port,enable, int_out_decode);
 
     --Decoding buffer
     EA_Concatination_signal<=instr_out(7 downto 5)&instr_out(0);
-    Decoding_Buffer_label:entity work.Decoding_Buffer(arch_Decoding_Buffer) port map(clk,decode_stall,decode_flush,pc_out(9 downto 0),pc_write_back,mem_read,mem_write,write_back,mem_to_reg,out_port,
+    Decoding_Buffer_label:entity work.Decoding_Buffer(arch_Decoding_Buffer) port map(clk,decode_stall,decode_flush,int_out_decode, pc_out(9 downto 0),pc_write_back,mem_read,mem_write,write_back,mem_to_reg,out_port,
     swap,instr_out(1),ea_immediate,jz,takenSigForBranch_out,flags_write_back,jmp,flags,instr_out(15 downto 14),instr_out(13 downto 11),instr_out(7 downto 5),instr_out(4 downto 2),
     instr_out(10 downto 8),EA_Concatination_signal,data1,data2,PcWrBack_out_decode,Read_Sig_out_decode,Write_Sig_out_decode,WbSig_out_decode,MemToRegSig_out_decode,OutPortSig_out_decode,
     SwapSig_out_decode,ExtendSig_out_decode,EAOrImmSig_out_decode,JzSig_out_decode,TakenSigForBranch_out_decode,ALU_WrFlagSig_out_decode,
     unCondSig_out_decode,flagsOrSrc_out_decode,typeOfInstr_out_decode,opcode_out_decode,Src1Address_out_decode,Src2Address_out_decode,DstAddress_out_decode,
-    EA_4_bits_out_decode,data1_out_decode,data2_out_decode, pc_exec_out_decode);
+    EA_4_bits_out_decode,data1_out_decode,data2_out_decode, pc_exec_out_decode, int_out_decode_buffer);
 
     process(cache_stall_mem,wrong_pred_sel,disableForImmediate_out,cache_stall_fetch,load_hazard_stall)
     begin
@@ -158,16 +158,16 @@ begin
         end if;
     end process;
 
-
+	--int_ff 	: entity work.FlipFlop port map('1', rst, clk, int_ret_flush, int_out_decode);
     --Execution Stage
     Operation<=typeOfInstr_out_decode&opcode_out_decode;
-    Execution_Stage :entity work.Execution(ExecutionArch) port map(data1_out_decode,data2_out_decode,AluResult_out_alu, wb_mux_output,ImmConcatenate,
+    Execution_Stage :entity work.Execution(ExecutionArch) port map(int_out_decode_buffer,data1_out_decode,data2_out_decode,AluResult_out_alu, wb_mux_output,ImmConcatenate,
     data2_out_decode,Rsrc2_out_alu,Rsrc2_out,Operation,DataFromMem_out(3 downto 0),src1_sel_forward_alu,src2_sel_forward_alu,clk, decode_flush,ExtendSig_out_decode,
     ALU_WrFlagSig_out_decode,TakenSigForBranch_out_decode,FlagOutput,prediction_out,Result,BrnchTakenOutput,Data2_out_ex_stage);
 
     --Wrong prediction signals 
     flush_wrong_prediction <= (FlagOutput(0) xnor (not TakenSigForBranch_out_decode)) and JzSig_out_decode;
-    wrong_pred_sel <= flush_wrong_prediction;
+    wrong_pred_sel <= flush_wrong_prediction or unCondSig_out_decode;
 	taken_in_branch_prediction <= TakenSigForBranch_out_decode when flush_wrong_prediction = '0' else
 								  not TakenSigForBranch_out_decode;
 

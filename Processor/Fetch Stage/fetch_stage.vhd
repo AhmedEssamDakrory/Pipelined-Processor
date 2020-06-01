@@ -5,7 +5,7 @@ use ieee.numeric_std.ALL;
 entity fetch_stage is
   
 port(
-	clk, rst 																			: in 	std_logic;
+	clk, rst, int 																			: in 	std_logic;
 	disable1, disable2, disable3,disable4,disable5										: in 	std_logic;
 	taken_sel,wrong_pred_sel,write_back_sel												: in	std_logic;
 	Rdest_sel																			: in	std_logic_vector(2 downto 0);
@@ -28,10 +28,11 @@ architecture structural of fetch_stage is
 		);
 	end component;
 	
-	signal R1,R2,R3,R4,R5,pc_inc,temp_pc						:	std_logic_vector(31 downto 0);
-	signal enable,flag,not_clock											:	std_logic;
+	signal R1,R2,R3,R4,R5,R6,pc_inc,temp_pc						:	std_logic_vector(31 downto 0);
+	signal enable,not_clock											:	std_logic;
+	signal flag		: std_logic_vector(1 downto 0);
 begin
-	pc_reg	:	reg port map(enable, rst, clk, R5, temp_pc);
+	pc_reg	:	reg port map(enable, rst, clk, R6, temp_pc);
 
 	pc <= temp_pc;
 	
@@ -50,8 +51,9 @@ begin
 	R4 <= R3 when write_back_sel = '0' else
 				R_writeback	;
 	
-	R5 <= "0000000000000000"&inst when flag = '1' else
-				R4;
+	R5 <= "00000000000000000000000000000010" when flag = "10" else R4;
+	R6 <= "0000000000000000"&inst when flag = "11" else R5;
+	
 	enable <= not (disable1 or disable2 or disable3 or disable4 or disable5);
 	pc_inc <= std_logic_vector( unsigned(temp_pc) + 1 );
 	
@@ -60,9 +62,11 @@ begin
 	begin
 		if(rising_Edge(clk)) then
 			if( rst = '1')then
-				flag <= '1';
+				flag <= "11";
+			elsif( int = '1') then 
+				flag <= "10";
 			elsif( enable = '1')then
-				flag <= '0';
+				flag <= "00";
 			end if;
 		end if;
 	end process;

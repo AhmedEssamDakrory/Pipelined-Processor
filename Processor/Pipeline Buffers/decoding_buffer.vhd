@@ -7,7 +7,9 @@ ENTITY Decoding_Buffer IS
     clk:IN STD_LOGIC;
     Load:IN STD_LOGIC;
     rst:IN STD_LOGIC;
+	int_in:IN STD_LOGIC;
     
+	Pc_exec_in     : in std_logic_vector(9 downto 0); 
     PcWrBack_in:in std_logic;
     Read_Sig_in:in std_logic;
     Write_sig_in:in std_logic;
@@ -52,7 +54,9 @@ ENTITY Decoding_Buffer IS
     DstAddress_out              :out std_logic_vector (2 downto 0);
     EA_4_bits_out               :out std_logic_vector (3 downto 0);
     data1_out                   :out std_logic_vector (31 downto 0);
-    data2_out                   :out std_logic_vector (31 downto 0)
+    data2_out                   :out std_logic_vector (31 downto 0);
+	Pc_exec_out      			:out std_logic_vector(9 downto 0);
+	int_out						:out STD_LOGIC
 );
 END Decoding_Buffer;
 ARCHITECTURE arch_Decoding_Buffer OF Decoding_Buffer IS
@@ -76,6 +80,7 @@ BEGIN
                 ALU_WrFlagSig_out <= '0';
                 unCondSig_out <= '0';
                 flagsOrSrc_out <= '0';
+				int_out <= '0';
                 typeOfInstr_out <= (others => '0');
                 opcode_out <= (others => '0');
                 Src1Address_out <= (others => '0');
@@ -84,6 +89,8 @@ BEGIN
                 EA_4_bits_out <= (others => '0');
                 data1_out <= (others => '0');
                 data2_out <= (others => '0');
+				Pc_exec_out <= (others => '0');
+				
             elsif Load = '1' then
                 PcWrBack_out <= PcWrBack_in ;
                 Read_Sig_out <= Read_Sig_in;
@@ -107,6 +114,8 @@ BEGIN
                 EA_4_bits_out <= EA_4_bits_in;
                 data1_out <= data1_in ;
                 data2_out <= data2_in;
+				Pc_exec_out <= Pc_exec_in;
+				int_out <= int_in;
             end if;
         end if;
     end process;

@@ -47,7 +47,8 @@ ENTITY DecodeStage IS
 	mem_to_reg			: OUT STD_LOGIC;
 	write_back			: OUT STD_LOGIC;
 	out_port			: OUT STD_LOGIC;
-	enable				: OUT STD_LOGIC
+	enable				: OUT STD_LOGIC;
+	int_out					: OUT STD_LOGIC
 	
 );
 END DecodeStage;
@@ -193,14 +194,14 @@ BEGIN
 	pc_inc				<= pc_inc_sig and not disable;
 	pc_write_back		<= pc_write_back_sig and not disable;
 	pc_disbale			<= pc_disbale_sig and not disable;
-	src1				<= src1_sig and not disable;
-	src2				<= src2_sig and not disable;
-	select_in			<= select_in_sig and not disable;
-	swap				<= swap_sig and not disable;
-	mem_to_reg			<= mem_to_reg_sig and not disable;
-	write_back			<= write_back_sig and not disable;
-	out_port			<= out_port_sig and not disable;
-	enable				<= enable_sig and not disable;
+	src1				<= src1_sig and not disable and not int;
+	src2				<= src2_sig and not disable and not int;
+	select_in			<= select_in_sig and not disable and not int;
+	swap				<= swap_sig and not disable and not int;
+	mem_to_reg			<= mem_to_reg_sig and not disable and not int;
+	write_back			<= write_back_sig and not disable and not int;
+	out_port			<= out_port_sig and not disable and not int;
+	enable				<= enable_sig and not disable and not int;
 	SP_load				<= '1' when stall_sp = '1' and ( ((op_code = "000" or op_code = "001") and instr_type = "10") or ((op_code = "010" or op_code = "011" or op_code = "100") and instr_type = "11") ) else '0';
 	
 	-- Adder/Subtractor of stack pointer
@@ -216,6 +217,6 @@ BEGIN
 		
 	   
 	END PROCESS;
-	
+	int_out <= int;
 END arch;
 
