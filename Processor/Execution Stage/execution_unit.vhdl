@@ -37,7 +37,7 @@ architecture ExecutionArch of Execution is
       Mux8_1 :entity work.Mux8(arch_mux8) generic map(N=>32) port map(Data1,RDestAlu,RDestMem,SrcAlu,SrcMem,ForwardData1,A);
       Mux8_2 :entity work.Mux8(arch_mux8) generic map(N=>32) port map(Data2,RDestAlu,RDestMem,SrcAlu,SrcMem,ForwardData2,Temp);
       Reg  :entity work.Reg(arch_register) generic map(N=>4) port map(stallFlags,'0',clk,FlagRegisterOutput,FlagOutput);
-      ALU :entity work.ALU(ALU_arcitecture) generic map(N=>32) port map(Operation,TempFlags,A,B,int,ResultSignal);
+      ALU :entity work.ALU(ALU_arcitecture) generic map(N=>32) port map(clk,Operation,TempFlags,A,B,int,ResultSignal);
       Result<=ResultSignal;
       PredictionResult<= '1' when (Unsigned(Operation)="11000" and FlagRegisterOutput(0)='1' ) else '0';
       
