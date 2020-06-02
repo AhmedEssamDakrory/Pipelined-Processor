@@ -94,11 +94,11 @@ begin
 		
 		Result<=ResultSignal(N-1 downto 0);   
 
-	
+	end process;
 	process(clk)
 		begin
 		if(rising_edge(clk) )then
-			if Operation(2) = '1' and Operation(1) = '0' and Operation(0) = '0'then 
+			if Operation(4) = '1' and Operation(3) = '1' and Operation(2) = '1' and Operation(1) = '0' and Operation(0) = '0'then 
 				flag <= "01";
 			elsif flag(1) = '0' and flag(0) = '1' then
 				flag <= "10";
