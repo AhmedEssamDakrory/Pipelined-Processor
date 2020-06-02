@@ -79,6 +79,7 @@ ARCHITECTURE arch OF DecodeStage IS
 	PORT(
 		clk 				: IN STD_LOGIC;
 		clr 				: IN STD_LOGIC;
+		stall   : IN STD_LOGIC;
 		instr_type			: IN STD_LOGIC_VECTOR(1 downto 0);
 		op_code				: IN STD_LOGIC_VECTOR(2 downto 0);
 		int					: IN STD_LOGIC;
@@ -102,7 +103,8 @@ ARCHITECTURE arch OF DecodeStage IS
 		mem_to_reg			: OUT STD_LOGIC;
 		write_back			: OUT STD_LOGIC;
 		out_port			: OUT STD_LOGIC;
-		enable				: OUT STD_LOGIC
+		enable				: OUT STD_LOGIC;
+		int_sig   : OUT STD_LOGIC
 		
 	);
 	END COMPONENT;
@@ -152,7 +154,7 @@ ARCHITECTURE arch OF DecodeStage IS
 	-- Control signals
 	SIGNAl sub_sig, ea_immediate_sig, mem_read_sig, mem_write_sig, push_pop_sig, jz_sig, jmp_sig, flags_sig, 
 		   flags_write_back_sig, pc_inc_sig, pc_write_back_sig, pc_disbale_sig, src1_sig, src2_sig,
-		   select_in_sig, swap_sig, mem_to_reg_sig, write_back_sig, out_port_sig,enable_sig :STD_LOGIC;
+		   select_in_sig, swap_sig, mem_to_reg_sig, write_back_sig, out_port_sig,enable_sig,int_sig :STD_LOGIC;
 	
 	SIGNAl data1_sig, data2_sig, PC_out, PC_incremented,in_port_out, out_port_out, SP_curr,
 		   SP_in, SP_out, SP_incremented, temp : STD_LOGIC_VECTOR(31 downto 0);
@@ -161,10 +163,10 @@ ARCHITECTURE arch OF DecodeStage IS
 	signal not_clk: std_logic;
 BEGIN
 	not_clk<=not clk;
-	control_unit	: ControlUnit port map (clk, clr, instr_type, op_code, int,  sub_sig, ea_immediate_sig, 
+	control_unit	: ControlUnit port map (clk, clr, stall_sp , instr_type, op_code, int,  sub_sig, ea_immediate_sig, 
 											mem_read_sig, mem_write_sig, push_pop_sig, jz_sig, jmp_sig, flags_sig, flags_write_back_sig, 
 											pc_inc_sig, pc_write_back_sig, pc_disbale_sig, src1_sig, src2_sig, select_in_sig,
-											swap_sig, mem_to_reg_sig, write_back_sig, out_port_sig, enable_sig);
+											swap_sig, mem_to_reg_sig, write_back_sig, out_port_sig, enable_sig , int_sig);
 	register_file	: RegisterFile port map (not_clk, clr, address1, address2, write_address1, write_address2,	dest, 
 											write_reg1, write_reg2, write_data1, write_data2, data1_sig, data2_sig, Rdst);
 	
@@ -217,6 +219,6 @@ BEGIN
 		
 	   
 	END PROCESS;
-	int_out <= int;
+	int_out <= int or int_sig;
 END arch;
 
