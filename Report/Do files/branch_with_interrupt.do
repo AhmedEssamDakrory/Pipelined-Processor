@@ -48,6 +48,14 @@ run
 force -freeze sim:/main/port_in 16#200 0
 run
 
-for {set x 0} {$x<120} {incr x} {
+for {set x 0} {$x<20} {incr x} {
+    run
+}
+
+force -freeze sim:/main/int 1 0
+run
+force -freeze sim:/main/int 0 0
+
+for {set x 0} {$x<100} {incr x} {
     run
 }
