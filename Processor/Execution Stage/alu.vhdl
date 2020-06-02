@@ -7,15 +7,17 @@ use IEEE.std_logic_signed.all;
 entity ALU is
     generic (N : Integer := 32);
     port(
-        Operation:in std_logic_vector(4 downto 0);
-        FlagsOutput: out std_logic_vector(3 downto 0);
-        A,B :in std_logic_vector(N-1 downto 0);
-		int: in std_logic;
-        Result:out std_logic_vector(N-1 downto 0)
+		clk				:	IN STD_LOGIC;
+        Operation		:  	IN std_logic_vector(4 downto 0);
+        FlagsOutput		: 	OUT std_logic_vector(3 downto 0);
+        A,B 			:	IN std_logic_vector(N-1 downto 0);
+		int				: 	IN std_logic;
+        Result			:	OUT std_logic_vector(N-1 downto 0)
     );
 end ALU;
 architecture ALU_arcitecture of ALU is
     signal ResultSignal:std_logic_vector(N downto 0);
+	  signal flag : STD_LOGIC_vector(1 downto 0) := "00";
 
     function CheckZero (F: in std_logic_vector)
     return std_logic is
@@ -28,10 +30,10 @@ architecture ALU_arcitecture of ALU is
     end function CheckZero;
 begin
     process(A,B,Operation,ResultSignal)
-    begin
+	begin
 		if(int = '1') then
 			ResultSignal <= '0' & A ; 
-        elsif (Operation(4)='0' and Operation(3)='0' )then  -- One Operand
+        elsif (flag(1) = '0' and flag(0) = '0' and Operation(4)='0' and Operation(3)='0' )then  -- One Operand
             case(Operation(2 downto 0)) is
                 when "000" => -- Nop
                 ResultSignal <= (others => '0');
@@ -47,7 +49,7 @@ begin
                 ResultSignal <= '0' & A ;
                 when others => ResultSignal <= (others => '0'); 
             end case;
-        elsif (Operation(4)='0' and Operation(3)='1') then  -- Two Operand
+        elsif ( flag(1) = '0' and flag(0) ='0' and Operation(4)='0' and Operation(3)='1') then  -- Two Operand
             case(Operation(2 downto 0)) is
                 when "000" => -- Swap
                 ResultSignal <= '0' & A ; 
@@ -67,16 +69,17 @@ begin
                 ResultSignal <= '0' & std_logic_vector(unsigned(A) sll to_integer(unsigned(B)));
                 when others => ResultSignal <= (others => '0');
             end case;
-         elsif (Operation(4)='1' and Operation(3)='0') then  -- Memory
+         elsif ( flag(1) = '0' and flag(0) ='0' and Operation(4)='1' and Operation(3)='0') then  -- Memory
             case(Operation(2 downto 0)) is
 				when "000" => ResultSignal <= '0' & A;
 				when "001" => ResultSignal <= '0' & A;
                 when others => ResultSignal <= '0' & B ;
             end case;
-		else
+		else	-- Branch
 			ResultSignal <= '0' & A;
-		
         end if;    
+		
+		
         ---------Update Flags--------------------------
 		if(not(Operation(4)='0' and Operation(3)='0' and Operation(2)='1' and Operation(1)='0' and Operation(0)='1' )) then
 			FlagsOutput(0)<=(not CheckZero(ResultSignal(N-1 downto 0)));
@@ -87,6 +90,21 @@ begin
 			end if;
 			FlagsOutput(2)<=ResultSignal(N);
 		end if;
-		Result<=ResultSignal(N-1 downto 0);
-    end process;
+        
+		
+		Result<=ResultSignal(N-1 downto 0);   
+
+	end process;
+	process(clk)
+		begin
+		if(rising_edge(clk) )then
+			if Operation(4) = '1' and Operation(3) = '1' and Operation(2) = '1' and Operation(1) = '0' and Operation(0) = '0'then 
+				flag <= "01";
+			elsif flag(1) = '0' and flag(0) = '1' then
+				flag <= "10";
+			else
+				flag <= "00";
+			end if;
+		end if;
+	end process;
 end ALU_arcitecture;
