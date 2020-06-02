@@ -90,10 +90,10 @@ begin
 			end if;
 			FlagsOutput(2)<=ResultSignal(N);
 		end if;
+        
 		
-		
-        Result<=ResultSignal(N-1 downto 0);   
-    end process;
+		Result<=ResultSignal(N-1 downto 0);   
+
 	
 	process(clk)
 		begin

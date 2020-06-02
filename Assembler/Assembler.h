@@ -1,5 +1,13 @@
 #pragma once
-#include <bits/stdc++.h>
+#include<map>
+#include<vector>
+#include<string>
+#include<bitset>
+#include<fstream>
+#include<string.h>
+#include <sstream> 
+#include <algorithm>    // std::transform
+#include <functional> 
 using namespace std;
 
 class Assembler {
