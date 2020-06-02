@@ -161,29 +161,6 @@ run
 force -freeze sim:/main/port_in 16#50 0
 run
 force -freeze sim:/main/port_in 16#0 0
-run
-
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
-run
+for {set x 0} {$x<58} {incr x} {
+    run
+}
