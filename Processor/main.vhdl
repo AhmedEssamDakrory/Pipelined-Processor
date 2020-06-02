@@ -19,7 +19,7 @@ architecture MainArchitecture of Main is
     --Memory buffer signals
     Signal PcWrBack_out,WbSig_out,MemToRegSig_out,OutPortSig_out,SwapSig_out    :std_logic;
     Signal DstAddress_out ,Src1Address_out                                      : std_logic_vector (2 downto 0);
-    Signal AluResult_out,DataFromMem_out,Rsrc2_out                                       : std_logic_vector (31 downto 0);
+    Signal AluResult_out,DataFromMem_out,Rsrc2_out                              : std_logic_vector (31 downto 0);
 
     Signal flush_mem :STD_LOGIC;
 
@@ -160,7 +160,7 @@ begin
 
 	--int_ff 	: entity work.FlipFlop port map('1', rst, clk, int_ret_flush, int_out_decode);
     --Execution Stage
-    Operation<=typeOfInstr_out_decode&opcode_out_decode;
+    Operation <=	typeOfInstr_out_decode & opcode_out_decode;
     Execution_Stage :entity work.Execution(ExecutionArch) port map(int_out_decode_buffer,data1_out_decode,data2_out_decode,AluResult_out_alu, wb_mux_output,ImmConcatenate,
     data2_out_decode,Rsrc2_out_alu,Rsrc2_out,Operation,DataFromMem_out(3 downto 0),src1_sel_forward_alu,src2_sel_forward_alu,clk, decode_flush,ExtendSig_out_decode,
     ALU_WrFlagSig_out_decode,TakenSigForBranch_out_decode,FlagOutput,prediction_out,Result,BrnchTakenOutput,Data2_out_ex_stage);

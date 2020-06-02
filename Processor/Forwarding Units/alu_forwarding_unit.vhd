@@ -23,7 +23,7 @@ end ALU_Forwarding_Unit;
 
 architecture arch_alu_forwarding_unit of ALU_Forwarding_Unit is
 begin
-src1_sel <= "000" when (oper = "00101" or oper = "10000") else
+src1_sel <= "000" when (oper = "00101" or oper = "10000" or oper = "11100" ) else
 			"001" when ( (src1 = dst_alu) and (wb_alu = '1') ) else
 			"100" when ( (src1 = src1_alu) and (swap_alu = '1')) else
 			"010" when ( (src1 = dst_mem) and (wb_mem = '1')) else

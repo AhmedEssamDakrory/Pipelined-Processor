@@ -32,7 +32,8 @@ ENTITY ControlUnit IS
 	write_back			: OUT STD_LOGIC;
 	out_port			: OUT STD_LOGIC;
 	enable				: OUT STD_LOGIC;
-	int_sig  : OUT STD_LOGIC
+	int_sig  			: OUT STD_LOGIC;
+	rti_sig				: OUT STD_LOGIC
 );
 END ControlUnit;
 ARCHITECTURE arch OF ControlUnit IS
@@ -53,16 +54,17 @@ BEGIN
 	interrupt_ff 	: FlipFlop port map('1', clr, clk, int, int_out);
 	int_sig  <= int_out;
 	rti_ff			: FlipFlop port map('1', clr, clk, rti, rti_out);
+	rti_sig	<= rti_out;
 	enable_ff		: FlipFlop port map(enbl, clr, clk, enbl, enbl_out);
 	-- Register signals
 	rti 				<= '1' when op_code = "100" and instr_type = "11" else '0';
 	enbl 				<= int or rti;
 	-- Control signals
-	sub					<= '1' when (op_code = "010" and instr_type = "11") or (op_code = "000" and instr_type = "10") or int_out = '1' else '0';
+	sub					<= '1' when (op_code = "010" and instr_type = "11") or (op_code = "000" and instr_type = "10") or int_out = '1' or int = '1'else '0';
 	ea_immediate		<= '1' when (op_code = "011" or op_code = "100" ) and instr_type = "10" else '0';
 	mem_read			<= '1' when ((op_code = "001" or op_code = "011") and instr_type = "10") or rti_out = '1' else '0';
 	mem_write			<= '1' when ((op_code = "000" or op_code = "100") and instr_type = "10") or int = '1'  or int_out = '1' else '0';
-	push_pop			<= '1' when (op_code = "000" and instr_type = "10") or int = '1' else '0';
+	push_pop			<= '1' when (op_code = "000" and instr_type = "10") or int = '1' or int_out = '1' else '0';
 	jz					<= '1' when op_code = "000" and instr_type = "11" else '0'; 
 	jmp					<= '1' when op_code = "001" and instr_type = "11" else '0';
 	pc_inc				<= '1' when (op_code = "000" or op_code = "010") and instr_type = "11" else '0';
